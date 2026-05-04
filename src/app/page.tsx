@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, Legend } from 'recharts';
 import { getAllZonas } from '@/data/spRegions';
 import { formatCurrency, formatCurrencyCompact, formatPercent, formatArea, formatDate, formatDateTime, daysUntil, getAttentionPoints } from '@/lib/format';
 import ChatBot from '@/components/ChatBot';
@@ -115,7 +115,7 @@ export default function Home() {
 
   const chartData = useMemo(() => {
     return filteredLots.slice(0, 8).map(lot => ({
-      name: lot.bairro.length > 12 ? lot.bairro.substring(0, 12) + '…' : lot.bairro,
+      name: lot.bairro.length > 20 ? lot.bairro.substring(0, 20) + '…' : lot.bairro,
       leilao: lot.analysis?.precoM2Leilao || 0,
       mercado: lot.analysis?.precoM2Mercado || 0,
       roi: lot.analysis?.roiEstimado || 0,
@@ -307,25 +307,95 @@ export default function Home() {
           {/* === PRICE COMPARISON CHART === */}
           {chartData.length > 0 && (
             <div className="chart-section animate-in">
-              <div className="chart-title">📊 Comparativo Preço/m² — Leilão vs. Mercado</div>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={chartData} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.06)" />
-                  <XAxis dataKey="name" tick={{ fill: '#94A3B8', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#94A3B8', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `R$${(v/1000).toFixed(0)}K`} />
-                  <Tooltip
-                    contentStyle={{ background: '#111827', border: '1px solid rgba(148,163,184,0.15)', borderRadius: '10px', fontSize: '12px', color: '#F1F5F9' }}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    formatter={(value: any, name: any) => [formatCurrency(Number(value)), name === 'leilao' ? 'Leilão (R$/m²)' : 'Mercado (R$/m²)']}
+              <div className="chart-title">📊 Preço m²: Oportunidade vs. Valor de Mercado</div>
+              
+              <svg width="0" height="0">
+                <defs>
+                  <linearGradient id="neonGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00FFA3" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#00D185" stopOpacity={0.8} />
+                  </linearGradient>
+                  <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                  <filter id="whiteGlow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
+              </svg>
+
+              <ResponsiveContainer width="100%" height={320}>
+                <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 600 }} 
+                    axisLine={false} 
+                    tickLine={false}
+                    interval={0}
+                    angle={-45}
+                    textAnchor="end"
+                    height={70}
                   />
-                  <Bar dataKey="mercado" name="Mercado" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                    {chartData.map((_, i) => <Cell key={i} fill="rgba(148,163,184,0.2)" />)}
-                  </Bar>
-                  <Bar dataKey="leilao" name="Leilão" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                    {chartData.map((_, i) => <Cell key={i} fill="#00FFA3" />)}
-                  </Bar>
-                </BarChart>
+                  <YAxis 
+                    tick={{ fill: '#94A3B8', fontSize: 10 }} 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tickFormatter={(v: number) => `R$${(v/1000).toFixed(1)}k`} 
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                    contentStyle={{ 
+                      background: 'rgba(5, 8, 15, 0.95)', 
+                      border: '1px solid rgba(0, 255, 163, 0.4)', 
+                      borderRadius: '16px', 
+                      fontSize: '12px',
+                      backdropFilter: 'blur(15px)',
+                      boxShadow: '0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 255, 163, 0.1)'
+                    }}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    formatter={(value: any, name: any) => [
+                      <span key={name} style={{ color: name === 'leilao' ? '#00FFA3' : '#FFFFFF', fontWeight: 800, textShadow: name === 'leilao' ? '0 0 10px rgba(0,255,163,0.5)' : 'none' }}>
+                        {formatCurrency(Number(value))}
+                      </span>,
+                      name === 'leilao' ? 'Preço Leilão' : 'Valor Mercado'
+                    ]}
+                  />
+                  <Legend 
+                    verticalAlign="top" 
+                    align="right" 
+                    iconType="circle"
+                    wrapperStyle={{ paddingBottom: '30px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }} 
+                  />
+                  <Bar 
+                    dataKey="leilao" 
+                    name="Preço Leilão" 
+                    fill="url(#neonGradient)" 
+                    radius={[6, 6, 0, 0]} 
+                    barSize={28}
+                    style={{ filter: 'url(#neonGlow)' }}
+                    animationDuration={2000}
+                    animationEasing="ease-out"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="mercado" 
+                    name="Valor Mercado" 
+                    stroke="#FFFFFF" 
+                    strokeWidth={3}
+                    strokeDasharray="6 4"
+                    dot={{ fill: '#FFFFFF', r: 5, strokeWidth: 2, stroke: '#00FFA3', filter: 'url(#whiteGlow)' }}
+                    activeDot={{ r: 8, stroke: '#FFFFFF', strokeWidth: 2, fill: '#00FFA3', filter: 'url(#neonGlow)' }}
+                    animationDuration={2500}
+                    animationEasing="ease-in-out"
+                  />
+                </ComposedChart>
               </ResponsiveContainer>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginTop: '12px', textAlign: 'center', fontStyle: 'italic', letterSpacing: '0.02em' }}>
+                * A barra em <span style={{ color: '#00FFA3', fontWeight: 700 }}>NEON EMERALD</span> representa a oportunidade; o horizonte <span style={{ color: '#FFFFFF', fontWeight: 700 }}>BRANCO</span> é o teto de mercado.
+              </div>
             </div>
           )}
 

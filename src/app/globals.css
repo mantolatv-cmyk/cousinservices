@@ -714,23 +714,47 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
 }
 
-/* === Chart Container === */
+/* === Chart Container — Futuristic Neon Upgrade === */
 .chart-section {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: rgba(10, 15, 26, 0.6);
+  border: 1px solid rgba(0, 255, 163, 0.2);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 32px;
-  backdrop-filter: blur(12px);
+  padding: 32px;
+  margin-bottom: 40px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 255, 163, 0.05);
+}
+
+.chart-section::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  animation: neon-scan 4s linear infinite;
+}
+
+@keyframes neon-scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .chart-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #00FFA3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* === Empty State === */
