@@ -39,8 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 # scraping data
-leiloes.json
-analise-resultado.json
 /reports/
 
 # playwright
