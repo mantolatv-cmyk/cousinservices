@@ -1,10 +1,6 @@
 {
-  "generatedAt": "2026-05-04T20:46:16.562Z",
-  "totalItems": 60,
-  "sources": {
-    "zukerman": 60,
-    "megaLeiloes": 0
-  },
+  "generatedAt": "2026-05-04T23:12:10.446Z",
+  "totalItems": 63,
   "items": [
     {
       "id": "zuk-pw-0",
@@ -23,7 +19,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nPardinho / SP - Condomínio Ninho Verde II Eco Residence\nRua 166, s/n\n450,00m² terreno\n1º leilão\nR$ 51.947,44\n15/04/2026 às 11:00\n2º leilão\nR$ 31.168,47\n40\n05/05/2026 às 11:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.109Z"
     },
     {
       "id": "zuk-pw-1",
@@ -42,7 +38,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nPardinho / SP - Condomínio Ninho Verde II Eco Residence\nRua 166, s/n\n450,00m² terreno\n1º leilão\nR$ 51.947,44\n15/04/2026 às 11:00\n2º leilão\nR$ 31.168,47\n40\n05/05/2026 às 11:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-3",
@@ -61,7 +57,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nSão Roque / SP - Bairro do Carmo\nAlameda dos Jacarandás, 200\n1.793,15m² terreno\n1º leilão\nR$ 547.400,48\n15/04/2026 às 11:40\n2º leilão\nR$ 328.440,29\n40\n05/05/2026 às 11:40",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-4",
@@ -80,7 +76,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nSão Roque / SP - Bairro do Carmo\nAlameda dos Jacarandás, 200\n1.793,15m² terreno\n1º leilão\nR$ 547.400,48\n15/04/2026 às 11:40\n2º leilão\nR$ 328.440,29\n40\n05/05/2026 às 11:40",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-6",
@@ -99,7 +95,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nMairiporã / SP - Samambaia\nRua José Rodrigues Barbosa, s/n\n393,00m² terreno\n1º leilão\nR$ 103.998,39\n15/04/2026 às 13:23\n2º leilão\nR$ 62.399,03\n40\n05/05/2026 às 13:23",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-7",
@@ -118,7 +114,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nMairiporã / SP - Samambaia\nRua José Rodrigues Barbosa, s/n\n393,00m² terreno\n1º leilão\nR$ 103.998,39\n15/04/2026 às 13:23\n2º leilão\nR$ 62.399,03\n40\n05/05/2026 às 13:23",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-9",
@@ -137,7 +133,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Desocupado\nÁrea Rural\nSão Paulo / SP - Parque São Rafael\nRua José de Assis Alvarenga, S/nº\n69.894,50m² terreno\nLance inicial\nR$ 41.618.000,00\n06/05/2026 às 10:30\n2º leilão\nR$ 20.606.000,00\n50\n27/05/20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-10",
@@ -156,7 +152,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Área Rural\nSão Paulo / SP - Parque São Rafael\nRua José de Assis Alvarenga, S/nº\n69.894,50m² terreno\nLance inicial\nR$ 41.618.000,00\n06/05/2026 às 10:30\n2º leilão\nR$ 20.606.000,00\n50\n27/05/2026 às 10:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-11",
@@ -175,7 +171,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Desocupado\nTerreno\nCamaçari / BA - Espaço Alfa\nLoteamento Parque Nascente do Capivara, s/n\n10.543,00m² terreno\nLance inicial\nR$ 848.400,00 \n40\n06/05/2026 às 13:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-12",
@@ -194,7 +190,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nCamaçari / BA - Espaço Alfa\nLoteamento Parque Nascente do Capivara, s/n\n10.543,00m² terreno\nLance inicial\nR$ 848.400,00 \n40\n06/05/2026 às 13:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-15",
@@ -213,7 +209,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nImperatriz / MA - Vilinha\nRua São Luís, s/n\n2.882,00m² terreno\nLance inicial\nR$ 1.567.000,00\n06/05/2026 às 13:11",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-16",
@@ -232,7 +228,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nImperatriz / MA - Vilinha\nRua São Luís, s/n\n2.882,00m² terreno\nLance inicial\nR$ 1.567.000,00\n06/05/2026 às 13:11",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-18",
@@ -251,7 +247,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapevi / SP - Condomínio Nova São Paulo\nEstrada do Itaqui, 120\n616,26m² terreno\n1º leilão\nR$ 242.939,15\n15/04/2026 às 14:00\n2º leilão\nR$ 121.469,58\n50\n06/05/2026 às 14:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-19",
@@ -270,7 +266,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapevi / SP - Condomínio Nova São Paulo\nEstrada do Itaqui, 120\n616,26m² terreno\n1º leilão\nR$ 242.939,15\n15/04/2026 às 14:00\n2º leilão\nR$ 121.469,58\n50\n06/05/2026 às 14:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-21",
@@ -289,7 +285,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapevi / SP - Condomínio Nova São Paulo\nEstrada do Itaqui, 120\n670,70m² terreno\n1º leilão\nR$ 263.545,60\n15/04/2026 às 14:03\n2º leilão\nR$ 131.772,80\n50\n06/05/2026 às 14:03",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-22",
@@ -308,7 +304,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapevi / SP - Condomínio Nova São Paulo\nEstrada do Itaqui, 120\n670,70m² terreno\n1º leilão\nR$ 263.545,60\n15/04/2026 às 14:03\n2º leilão\nR$ 131.772,80\n50\n06/05/2026 às 14:03",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-24",
@@ -327,7 +323,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapevi / SP - Condomínio Nova São Paulo\nEstrada do Itaqui, 120\n561,26m² terreno\n1º leilão\nR$ 231.214,02\n15/04/2026 às 14:06\n2º leilão\nR$ 115.607,01\n50\n06/05/2026 às 14:06",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-25",
@@ -346,7 +342,7 @@
       "dataLeilao": "2026-04-15T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapevi / SP - Condomínio Nova São Paulo\nEstrada do Itaqui, 120\n561,26m² terreno\n1º leilão\nR$ 231.214,02\n15/04/2026 às 14:06\n2º leilão\nR$ 115.607,01\n50\n06/05/2026 às 14:06",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-27",
@@ -365,7 +361,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nCapão Bonito / SP - Jardim Santa Izabel\nRua Seimei Sato, S/n\n126,00m² terreno\n1º leilão\nR$ 56.539,88\n06/05/2026 às 16:00\n2º leilão\nR$ 33.923,93\n40\n26/05/2026 às 16:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-28",
@@ -384,7 +380,7 @@
       "dataLeilao": "2026-05-06T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nCapão Bonito / SP - Jardim Santa Izabel\nRua Seimei Sato, S/n\n126,00m² terreno\n1º leilão\nR$ 56.539,88\n06/05/2026 às 16:00\n2º leilão\nR$ 33.923,93\n40\n26/05/2026 às 16:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-30",
@@ -403,7 +399,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBarra Bonita / SP - Jardim das Orquídeas\nRua Joaquim Polato, S/n\n1.050,00m² terreno\n1º leilão\nR$ 231.326,25\n07/05/2026 às 10:00\n2º leilão\nR$ 161.928,37\n30\n27/05/2026 às 10:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-31",
@@ -422,7 +418,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBarra Bonita / SP - Jardim das Orquídeas\nRua Joaquim Polato, S/n\n1.050,00m² terreno\n1º leilão\nR$ 231.326,25\n07/05/2026 às 10:00\n2º leilão\nR$ 161.928,37\n30\n27/05/2026 às 10:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-33",
@@ -441,7 +437,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBarra Bonita / SP - Distrito Industrial\nRua 12, S/n\n1.860,00m² terreno\n1º leilão\nR$ 1.155.346,90\n07/05/2026 às 10:20\n2º leilão\nR$ 808.742,83\n30\n27/05/2026 às 10:20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-34",
@@ -460,7 +456,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBarra Bonita / SP - Distrito Industrial\nRua 12, S/n\n1.860,00m² terreno\n1º leilão\nR$ 1.155.346,90\n07/05/2026 às 10:20\n2º leilão\nR$ 808.742,83\n30\n27/05/2026 às 10:20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-36",
@@ -479,7 +475,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBarra Bonita / SP - Jardim das Orquídeas\nRua Joaquim Polato, s/n\n930,75m² terreno\n1º leilão\nR$ 691.096,96\n07/05/2026 às 10:30\n2º leilão\nR$ 483.767,87\n30\n27/05/2026 às 10:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-37",
@@ -498,7 +494,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBarra Bonita / SP - Jardim das Orquídeas\nRua Joaquim Polato, s/n\n930,75m² terreno\n1º leilão\nR$ 691.096,96\n07/05/2026 às 10:30\n2º leilão\nR$ 483.767,87\n30\n27/05/2026 às 10:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-39",
@@ -517,7 +513,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nSalvador / BA - Itapuã\nRua Encontro das Árvores, 19B\n472,50m² terreno\nValor\nR$ 111.000,00\n07/05/2026 às 11:28",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-40",
@@ -536,7 +532,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nSalvador / BA - Itapuã\nRua Encontro das Árvores, 19B\n472,50m² terreno\nValor\nR$ 111.000,00\n07/05/2026 às 11:28",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-42",
@@ -555,7 +551,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapetinga / BA - Recanto da Colina\nRua Jonas Coelho dos Santos , s/nº\n826,50m² terreno\nValor\nR$ 105.000,00\n07/05/2026 às 11:44",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-43",
@@ -574,7 +570,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapetinga / BA - Recanto da Colina\nRua Jonas Coelho dos Santos , s/nº\n826,50m² terreno\nValor\nR$ 105.000,00\n07/05/2026 às 11:44",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-45",
@@ -593,7 +589,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAdamantina / SP - Residencial Parque Tangará\nRua Juruva, S/n\n6.600,00m² terreno\n1º leilão\nR$ 376.561,79\n07/05/2026 às 11:20\n2º leilão\nR$ 225.937,07\n40\n27/05/2026 às 11:20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-46",
@@ -612,7 +608,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAdamantina / SP - Residencial Parque Tangará\nRua Juruva, S/n\n6.600,00m² terreno\n1º leilão\nR$ 376.561,79\n07/05/2026 às 11:20\n2º leilão\nR$ 225.937,07\n40\n27/05/2026 às 11:20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-48",
@@ -631,7 +627,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAdamantina / SP - Residencial Boa Vista\nRua Anselmo Fortunato Perin, s/n\n330,00m² terreno\n1º leilão\nR$ 125.721,13\n07/05/2026 às 14:30\n2º leilão\nR$ 75.432,68\n40\n28/05/2026 às 14:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-49",
@@ -650,7 +646,7 @@
       "dataLeilao": "2026-05-07T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAdamantina / SP - Residencial Boa Vista\nRua Anselmo Fortunato Perin, s/n\n330,00m² terreno\n1º leilão\nR$ 125.721,13\n07/05/2026 às 14:30\n2º leilão\nR$ 75.432,68\n40\n28/05/2026 às 14:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-51",
@@ -669,7 +665,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapetininga / SP - Jardim Santa Inêz\nRua Pedro Paulo Barretti, S/n\n150,00m² terreno\n1º leilão\nR$ 76.457,59\n08/05/2026 às 10:30\n2º leilão\nR$ 45.874,55\n40\n28/05/2026 às 10:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-52",
@@ -688,7 +684,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItapetininga / SP - Jardim Santa Inêz\nRua Pedro Paulo Barretti, S/n\n150,00m² terreno\n1º leilão\nR$ 76.457,59\n08/05/2026 às 10:30\n2º leilão\nR$ 45.874,55\n40\n28/05/2026 às 10:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-54",
@@ -707,7 +703,7 @@
       "dataLeilao": "2026-04-24T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nMirassol / SP - Parque dos Ipês I\nRua Pedro Mendes de Souza (Antiga Rua Projetada 2), s/nº\n200,00m² terreno\n1º leilão\nR$ 125.071,23\n24/04/2026 às 10:30\n2º leilão\nR$ 144.092,64\n08/05/2026 às 10",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-55",
@@ -726,7 +722,7 @@
       "dataLeilao": "2026-04-24T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nMirassol / SP - Parque dos Ipês I\nRua Pedro Mendes de Souza (Antiga Rua Projetada 2), s/nº\n200,00m² terreno\n1º leilão\nR$ 125.071,23\n24/04/2026 às 10:30\n2º leilão\nR$ 144.092,64\n08/05/2026 às 10",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-57",
@@ -745,7 +741,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nParanapanema / SP - Terras de Santa Cristina XIII\nRua 141, s/n\n450,00m² terreno\n1º leilão\nR$ 21.847,48\n08/05/2026 às 11:30\n2º leilão\nR$ 10.923,74\n50\n29/05/2026 às 11:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-58",
@@ -764,7 +760,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nParanapanema / SP - Terras de Santa Cristina XIII\nRua 141, s/n\n450,00m² terreno\n1º leilão\nR$ 21.847,48\n08/05/2026 às 11:30\n2º leilão\nR$ 10.923,74\n50\n29/05/2026 às 11:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-60",
@@ -783,7 +779,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nSanta Maria da Serra / SP - Jardim Levorato\nRua Paschoal Ferrari, S/n\n250,00m² terreno\n1º leilão\nR$ 225.954,07\n08/05/2026 às 13:30\n2º leilão\nR$ 135.572,44\n40\n28/05/2026 às 13:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-61",
@@ -802,7 +798,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nSanta Maria da Serra / SP - Jardim Levorato\nRua Paschoal Ferrari, S/n\n250,00m² terreno\n1º leilão\nR$ 225.954,07\n08/05/2026 às 13:30\n2º leilão\nR$ 135.572,44\n40\n28/05/2026 às 13:30",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-63",
@@ -821,7 +817,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBragança Paulista / SP - Portal São Marcelo\nAvenida José Cypriano de Souza, S/n\n1.017,36m² terreno\n1º leilão\nR$ 49.484,99\n08/05/2026 às 16:00\n2º leilão\nR$ 29.690,99\n40\n28/05/2026 às 16:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-64",
@@ -840,7 +836,7 @@
       "dataLeilao": "2026-05-08T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nBragança Paulista / SP - Portal São Marcelo\nAvenida José Cypriano de Souza, S/n\n1.017,36m² terreno\n1º leilão\nR$ 49.484,99\n08/05/2026 às 16:00\n2º leilão\nR$ 29.690,99\n40\n28/05/2026 às 16:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-66",
@@ -859,7 +855,7 @@
       "dataLeilao": "2026-04-17T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItatiba / SP - Portal Giardino\nRua José Carlos Carneiro, S/n\n430,00m² terreno\n1º leilão\nR$ 233.418,40\n17/04/2026 às 16:00\n2º leilão\nR$ 140.051,04\n40\n08/05/2026 às 16:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-67",
@@ -878,7 +874,7 @@
       "dataLeilao": "2026-04-17T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nItatiba / SP - Portal Giardino\nRua José Carlos Carneiro, S/n\n430,00m² terreno\n1º leilão\nR$ 233.418,40\n17/04/2026 às 16:00\n2º leilão\nR$ 140.051,04\n40\n08/05/2026 às 16:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-69",
@@ -897,7 +893,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nUberlândia / MG - Bairro Novo Mundo\nAvenida Canela do Bosque, s/nº\n267,56m² terreno\n1º leilão\nR$ 365.769,39\n11/05/2026 às 10:00\n2º leilão\nR$ 324.126,50\n11\n18/05/2026 às 10:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-70",
@@ -916,7 +912,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nUberlândia / MG - Bairro Novo Mundo\nAvenida Canela do Bosque, s/nº\n267,56m² terreno\n1º leilão\nR$ 365.769,39\n11/05/2026 às 10:00\n2º leilão\nR$ 324.126,50\n11\n18/05/2026 às 10:00",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-72",
@@ -935,7 +931,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAdamantina / SP - Residencial Montagnoli\nRua Diego Garcia Morales, s/n\n259,60m² terreno\n1º leilão\nR$ 158.833,93\n11/05/2026 às 10:10\n2º leilão\nR$ 95.300,36\n40\n01/06/2026 às 10:10",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-73",
@@ -954,7 +950,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAdamantina / SP - Residencial Montagnoli\nRua Diego Garcia Morales, s/n\n259,60m² terreno\n1º leilão\nR$ 158.833,93\n11/05/2026 às 10:10\n2º leilão\nR$ 95.300,36\n40\n01/06/2026 às 10:10",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-75",
@@ -973,7 +969,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nParanapanema / SP - Loteamento Terras de Santa Cristina - Gleba VI\nRua 02, s/n\n450,00m² terreno\n1º leilão\nR$ 156.867,43\n11/05/2026 às 10:40\n2º leilão\nR$ 94.120,46\n40\n01/06/2026 às 10:40",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-76",
@@ -992,7 +988,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nParanapanema / SP - Loteamento Terras de Santa Cristina - Gleba VI\nRua 02, s/n\n450,00m² terreno\n1º leilão\nR$ 156.867,43\n11/05/2026 às 10:40\n2º leilão\nR$ 94.120,46\n40\n01/06/2026 às 10:40",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-79",
@@ -1011,7 +1007,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAmérico de Campos / SP - Papini e Barreto\nAvenida João Gonçalves Ferreira, s/n\n259,18m² terreno\n1º leilão\nR$ 46.500,43\n11/05/2026 às 14:20\n2º leilão\nR$ 23.250,22\n50\n01/06/2026 às 14:20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-80",
@@ -1030,7 +1026,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAmérico de Campos / SP - Papini e Barreto\nAvenida João Gonçalves Ferreira, s/n\n259,18m² terreno\n1º leilão\nR$ 46.500,43\n11/05/2026 às 14:20\n2º leilão\nR$ 23.250,22\n50\n01/06/2026 às 14:20",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-82",
@@ -1049,7 +1045,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAmérico de Campos / SP - Papini e Barreto\nRua Deoclecio Afonso de Melo, s/n\n200,00m² terreno\n1º leilão\nR$ 41.333,71\n11/05/2026 às 14:23\n2º leilão\nR$ 20.666,85\n50\n01/06/2026 às 14:23",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-83",
@@ -1068,7 +1064,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAmérico de Campos / SP - Papini e Barreto\nRua Deoclecio Afonso de Melo, s/n\n200,00m² terreno\n1º leilão\nR$ 41.333,71\n11/05/2026 às 14:23\n2º leilão\nR$ 20.666,85\n50\n01/06/2026 às 14:23",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-85",
@@ -1087,7 +1083,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAmérico de Campos / SP - Papini e Barreto\nRua Deoclecio Afonso de Melo, s/n\n200,00m² terreno\n1º leilão\nR$ 41.333,71\n11/05/2026 às 14:26\n2º leilão\nR$ 20.666,85\n50\n01/06/2026 às 14:26",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-86",
@@ -1106,7 +1102,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nAmérico de Campos / SP - Papini e Barreto\nRua Deoclecio Afonso de Melo, s/n\n200,00m² terreno\n1º leilão\nR$ 41.333,71\n11/05/2026 às 14:26\n2º leilão\nR$ 20.666,85\n50\n01/06/2026 às 14:26",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-88",
@@ -1125,7 +1121,7 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nPiracaia / SP - Canedos\nRua Catorze, s/n\n1.510,25m² terreno\n1º leilão\nR$ 102.479,34\n11/05/2026 às 14:50\n2º leilão\nR$ 61.487,60\n40\n02/06/2026 às 14:50",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
     },
     {
       "id": "zuk-pw-89",
@@ -1144,7 +1140,64 @@
       "dataLeilao": "2026-05-11T14:00:00",
       "leiloeiro": "Zukerman Leilões",
       "descricao": "Terreno\nPiracaia / SP - Canedos\nRua Catorze, s/n\n1.510,25m² terreno\n1º leilão\nR$ 102.479,34\n11/05/2026 às 14:50\n2º leilão\nR$ 61.487,60\n40\n02/06/2026 às 14:50",
-      "scrapedAt": "2026-05-04T20:46:08.890Z"
+      "scrapedAt": "2026-05-04T23:11:49.110Z"
+    },
+    {
+      "id": "freitas-pw-0-1777936330357",
+      "fonte": "Freitas Leiloeiro",
+      "url": "https://www.freitasleiloeiro.com.br",
+      "endereco": "São Paulo",
+      "bairro": "São Paulo",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "",
+      "areaM2": 300,
+      "lanceInicial": 10000,
+      "valorAvaliacao": 16000,
+      "status": "Aberto",
+      "tipoLeilao": "Judicial",
+      "dataLeilao": "2026-05-19T23:12:10.357Z",
+      "leiloeiro": "Freitas Leiloeiro",
+      "descricao": "  \nRefine sua busca:\n Tipo de imóvel:\nTodos\nCasas (34)\nApartamentos / Flats (13)\nImóveis Rurais (5)\nTerrenos / Lotes (4)\nImóveis Comerciais (2)\nPrédios (1)\nGalpões (1)\nCasas de Condomínio (1)\n UF:\nTod",
+      "scrapedAt": "2026-05-04T23:12:10.357Z"
+    },
+    {
+      "id": "freitas-pw-1-1777936330357",
+      "fonte": "Freitas Leiloeiro",
+      "url": "https://www.freitasleiloeiro.com.br",
+      "endereco": "São Paulo",
+      "bairro": "São Paulo",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "",
+      "areaM2": 300,
+      "lanceInicial": 10000,
+      "valorAvaliacao": 16000,
+      "status": "Aberto",
+      "tipoLeilao": "Judicial",
+      "dataLeilao": "2026-05-19T23:12:10.357Z",
+      "leiloeiro": "Freitas Leiloeiro",
+      "descricao": "  \nRefine sua busca:\n Tipo de imóvel:\nTodos\nCasas (34)\nApartamentos / Flats (13)\nImóveis Rurais (5)\nTerrenos / Lotes (4)\nImóveis Comerciais (2)\nPrédios (1)\nGalpões (1)\nCasas de Condomínio (1)\n UF:\nTod",
+      "scrapedAt": "2026-05-04T23:12:10.357Z"
+    },
+    {
+      "id": "freitas-pw-2-1777936330357",
+      "fonte": "Freitas Leiloeiro",
+      "url": "https://www.freitasleiloeiro.com.br/Leiloes/LoteDetalhes?leilaoId=7809&loteNumero=6",
+      "endereco": "07/05/2026",
+      "bairro": "07/05/2026",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "",
+      "areaM2": 300,
+      "lanceInicial": 266466.16,
+      "valorAvaliacao": 426345.85599999997,
+      "status": "Aberto",
+      "tipoLeilao": "Judicial",
+      "dataLeilao": "2026-05-07T14:00:00",
+      "leiloeiro": "Freitas Leiloeiro",
+      "descricao": "006\n07/05/2026 14:00\nSobral-CE. Bairro Antônio Carlos Belchior (antigo Bairro das Nações). Loteamento...\nR$ 266.466,16\nLance Mínimo\n SOBRAL/CE\nABERTO PARA LANCES",
+      "scrapedAt": "2026-05-04T23:12:10.357Z"
     }
   ]
 }

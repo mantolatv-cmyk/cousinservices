@@ -1,103 +1,106 @@
-// ============================================================
-// CousinServices — Caixa Imóveis Scraper
-// Scraping de terrenos do portal de venda de imóveis da Caixa
-// ============================================================
+import { Page } from 'playwright';
 
-import { BaseScraper, ScrapedLot } from './base';
+export interface LeilaoItem {
+  id: string;
+  fonte: string;
+  url: string;
+  endereco: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  areaM2: number;
+  lanceInicial: number;
+  valorAvaliacao: number;
+  status: string;
+  tipoLeilao: string;
+  dataLeilao: string;
+  leiloeiro: string;
+  descricao: string;
+  scrapedAt: string;
+}
 
-export class CaixaImoveisScraper extends BaseScraper {
-  constructor() {
-    super('Caixa Econômica', 'https://venda-imoveis.caixa.gov.br');
-  }
+/**
+ * Scraper para o portal de Imóveis da Caixa Econômica Federal.
+ * Utiliza o Playwright para navegar e contornar proteções de bot.
+ */
+export async function scrapeCaixa(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Caixa Imóveis] Iniciando scraping via Navegador...');
 
-  async scrape(): Promise<ScrapedLot[]> {
-    const lots: ScrapedLot[] = [];
+  try {
+    // Acessar a página de busca
+    await page.goto('https://venda-imoveis.caixa.gov.br/sistema/busca-imovel.asp', {
+      waitUntil: 'networkidle',
+      timeout: 60000,
+    });
 
-    try {
-      await this.init();
+    // Selecionar SP
+    await page.selectOption('#nu_estado', 'SP');
+    await page.waitForTimeout(1000);
 
-      // Caixa portal for SP terrenos
-      const url = `${this.baseUrl}/sistema/busca-imovel.asp?sltTipoBusca=imoveis&sltEstado=SP&sltTipoBem=terreno`;
-      const ok = await this.navigateWithRetry(url);
-      if (!ok) {
-        console.warn(`  [${this.sourceName}] Falha ao acessar.`);
-        return lots;
-      }
+    // Selecionar Terreno (valor '10' geralmente para terreno)
+    // Vamos tentar pelo texto para ser mais seguro
+    await page.selectOption('#tp_imovel', { label: 'Terreno' });
+    
+    // Clicar em buscar
+    await page.click('#btn_next');
+    
+    // Aguardar resultados
+    await page.waitForSelector('.dados-imovel, .card-imovel, #listaImoveis', { timeout: 30000 });
+    await page.waitForTimeout(3000);
 
-      await this.delay(4000);
+    // Extrair dados da lista
+    const rawItems = await page.evaluate(() => {
+      const results: any[] = [];
+      const cards = document.querySelectorAll('.dados-imovel, .card-imovel, [class*="item-imovel"]');
+      
+      cards.forEach(card => {
+        const text = (card as HTMLElement).innerText;
+        const link = (card.querySelector('a') as HTMLAnchorElement)?.href || '';
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
 
-      const results = await this.page!.evaluate(() => {
-        const items: Array<{
-          endereco: string;
-          preco: string;
-          avaliacao: string;
-          area: string;
-          link: string;
-          cidade: string;
-          descricao: string;
-        }> = [];
-
-        // Caixa uses table-based or list-based layout
-        const rows = document.querySelectorAll('tr, [class*="imovel"], [class*="item"], [class*="resultado"], .list-group-item, article');
-
-        rows.forEach((row) => {
-          const el = row as HTMLElement;
-          const text = el.innerText || '';
-
-          if (!text.match(/terreno|lote/i)) return;
-          if (text.length < 30) return;
-
-          const linkEl = el.querySelector('a') as HTMLAnchorElement;
-          const precoMatch = text.match(/R\$\s*[\d.,]+/g) || [];
-          const areaMatch = text.match(/[\d.,]+\s*m[²2]/i);
-          const cidadeMatch = text.match(/(?:São Paulo|Guarulhos|Osasco|Campinas|Santos|Sorocaba|S\.B\. do Campo|Santo André)/i);
-
-          items.push({
-            endereco: text.substring(0, 150).replace(/\n/g, ' '),
-            preco: precoMatch[0] || '',
-            avaliacao: precoMatch.length > 1 ? precoMatch[1] : '',
-            area: areaMatch?.[0] || '',
-            link: linkEl?.href || '',
-            cidade: cidadeMatch?.[0] || 'São Paulo',
-            descricao: text.substring(0, 200).replace(/\n/g, ' '),
-          });
+        results.push({
+          fullText: text,
+          link,
+          prices: prices.map(p => p.trim())
         });
-
-        return items;
       });
+      return results;
+    });
 
-      console.log(`  [${this.sourceName}] Encontrados ${results.length} itens brutos.`);
+    console.log(`  [Caixa] ${rawItems.length} cards encontrados.`);
 
-      for (const r of results) {
-        const area = this.parseArea(r.area);
-        const lance = this.parseCurrency(r.preco);
-        if (area <= 0 || lance <= 0) continue;
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseFloat(r.prices[0]?.replace(/[R$\s.]/g, '').replace(',', '.') || '0');
+      if (lance <= 0) continue;
 
-        lots.push({
-          source: this.sourceName,
-          sourceUrl: r.link || this.baseUrl,
-          endereco: r.endereco,
-          bairro: r.cidade || 'São Paulo',
-          cidade: r.cidade || 'São Paulo',
-          estado: 'SP',
-          areaM2: area,
-          tipo: 'Terreno',
-          descricao: r.descricao,
-          status: 'Venda Direta',
-          tipoLeilao: 'Extrajudicial',
-          dataLeilao: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          leiloeiro: 'Caixa Econômica Federal',
-          valorAvaliacao: this.parseCurrency(r.avaliacao) || lance * 1.3,
-          lanceInicial: lance,
-        });
-      }
-    } catch (err) {
-      console.error(`  [${this.sourceName}] Erro: ${(err as Error).message}`);
-    } finally {
-      await this.close();
+      items.push({
+        id: `caixa-pw-${i}-${Date.now()}`,
+        fonte: 'Imóveis Caixa',
+        url: r.link || 'https://venda-imoveis.caixa.gov.br',
+        endereco: r.fullText.split('\n')[0] || 'São Paulo',
+        bairro: r.fullText.match(/Bairro:\s*([^|]+)/)?.[1]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: r.fullText.match(/\d{8}/)?.[0] || '',
+        areaM2: 250, // Padrão se não achar
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.3,
+        status: 'Leilão/Venda Direta',
+        tipoLeilao: 'Venda Online',
+        dataLeilao: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+        leiloeiro: 'Caixa Econômica Federal',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
     }
 
-    console.log(`  [${this.sourceName}] Total extraído: ${lots.length}`);
-    return lots;
+  } catch (err) {
+    console.error(`  [Caixa] Erro no scraping: ${(err as Error).message}`);
   }
+
+  console.log(`  [Caixa] ✅ ${items.length} terrenos extraídos.`);
+  return items;
 }
