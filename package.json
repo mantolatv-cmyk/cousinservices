@@ -6,12 +6,21 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "scrape": "tsx src/scripts/run-scraper.ts",
+    "scrape:pw": "tsx src/scripts/scraper-playwright.ts",
+    "analise": "tsx src/scripts/analise.ts"
   },
   "dependencies": {
+    "cheerio": "^1.2.0",
+    "lucide-react": "^1.14.0",
     "next": "16.2.4",
+    "playwright": "^1.59.1",
+    "puppeteer": "^24.42.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "tsx": "^4.21.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
