@@ -1,11 +1,26 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, Legend } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, Legend, PieChart, Pie } from 'recharts';
 import { getAllZonas } from '@/data/spRegions';
 import { formatCurrency, formatCurrencyCompact, formatPercent, formatArea, formatDate, formatDateTime, daysUntil, getAttentionPoints } from '@/lib/format';
 import ChatBot from '@/components/ChatBot';
 import type { AuctionLot, FilterState, ScrapingStatus as ScrapingStatusType } from '@/lib/types';
+
+// ===================== CONFIDENCE SEMAPHORE =====================
+function getConfidence(lot: AuctionLot): { level: 'high' | 'medium' | 'low'; label: string; color: string } {
+  const roi = lot.analysis?.roiEstimado || 0;
+  const hasZone = !!lot.zona;
+  const hasCEP = !!lot.cep;
+  // If ROI is absurdly high, it's likely a pricing fallback
+  if (roi > 2000) return { level: 'low', label: 'Baixa', color: '#FF3366' };
+  if (roi > 500 && !hasCEP) return { level: 'low', label: 'Baixa', color: '#FF3366' };
+  if (roi > 200 || !hasZone) return { level: 'medium', label: 'Média', color: '#FFB800' };
+  return { level: 'high', label: 'Alta', color: '#00FFA3' };
+}
+
+const ITEMS_PER_PAGE = 20;
+const PIE_COLORS = ['#00FFA3', '#00E0FF', '#FFB800', '#C084FC', '#FF3366', '#60A5FA'];
 
 // ===================== METRICS CALCULATOR =====================
 function calcMetrics(lots: AuctionLot[]) {
@@ -41,6 +56,8 @@ export default function Home() {
   const [botFilter, setBotFilter] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [priceRange, setPriceRange] = useState<string>('all');
 
   // ===================== FETCH DATA FROM API =====================
   const fetchLots = useCallback(async () => {
@@ -94,6 +111,16 @@ export default function Home() {
     if (filters.areaMinima) lots = lots.filter(l => l.areaM2 >= (filters.areaMinima || 0));
     if (filters.areaMaxima && filters.areaMaxima < 100000) lots = lots.filter(l => l.areaM2 <= (filters.areaMaxima || 100000));
 
+    // Price range filter
+    if (priceRange !== 'all') {
+      const [minP, maxP] = priceRange.split('-').map(Number);
+      lots = lots.filter(l => {
+        const inv = l.analysis?.investimentoTotal || 0;
+        if (maxP === 0) return inv >= minP; // "500000-0" means >= 500k
+        return inv >= minP && inv <= maxP;
+      });
+    }
+
     // Sort
     const sortBy = filters.ordenarPor || 'roi';
     lots.sort((a, b) => {
@@ -109,9 +136,12 @@ export default function Home() {
     });
 
     return lots;
-  }, [allLots, filters, botFilter]);
+  }, [allLots, filters, botFilter, priceRange]);
 
   const metrics = useMemo(() => calcMetrics(filteredLots), [filteredLots]);
+
+  // Reset page when filters change
+  useEffect(() => { setCurrentPage(1); }, [filters, botFilter, priceRange]);
 
   const chartData = useMemo(() => {
     return filteredLots.slice(0, 8).map(lot => ({
@@ -121,6 +151,23 @@ export default function Home() {
       roi: lot.analysis?.roiEstimado || 0,
     }));
   }, [filteredLots]);
+
+  // Region distribution for PieChart
+  const regionData = useMemo(() => {
+    const map = new Map<string, number>();
+    filteredLots.forEach(l => {
+      const zone = l.zona || 'Outros';
+      map.set(zone, (map.get(zone) || 0) + 1);
+    });
+    return Array.from(map.entries()).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  }, [filteredLots]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredLots.length / ITEMS_PER_PAGE);
+  const paginatedLots = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredLots.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredLots, currentPage]);
 
   // ===================== SCRAPING STATUS from real data =====================
   const scrapingSources: ScrapingStatusType[] = useMemo(() => {
@@ -297,6 +344,17 @@ export default function Home() {
                 <option value="area">Maior Área</option>
               </select>
             </div>
+            <div className="filter-divider" />
+            <div className="filter-group">
+              <label className="filter-label">Investimento</label>
+              <select className="filter-select" value={priceRange} onChange={e => setPriceRange(e.target.value)}>
+                <option value="all">Todos</option>
+                <option value="0-50000">Até R$ 50K</option>
+                <option value="50000-200000">R$ 50K — R$ 200K</option>
+                <option value="200000-500000">R$ 200K — R$ 500K</option>
+                <option value="500000-0">Acima de R$ 500K</option>
+              </select>
+            </div>
             <div style={{ flex: 1 }} />
             <div className="filter-group">
               <label className="filter-label" style={{ visibility: 'hidden' }}>_</label>
@@ -399,6 +457,64 @@ export default function Home() {
             </div>
           )}
 
+          {/* === REGION DISTRIBUTION CHART === */}
+          {regionData.length > 1 && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '24px',
+              marginBottom: '32px',
+            }}>
+              <div className="chart-section animate-in" style={{ marginBottom: 0 }}>
+                <div className="chart-title" style={{ fontSize: '16px' }}>🗺️ Distribuição por Região</div>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={regionData}
+                      cx="50%" cy="50%"
+                      innerRadius={55} outerRadius={95}
+                      paddingAngle={3}
+                      dataKey="value"
+                      stroke="rgba(0,0,0,0.3)"
+                      strokeWidth={2}
+                      animationDuration={1500}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                    >
+                      {regionData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        background: 'rgba(5, 8, 15, 0.95)',
+                        border: '1px solid rgba(0, 255, 163, 0.3)',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                      }}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      formatter={(value: any) => [`${value} terreno${value !== 1 ? 's' : ''}`, 'Quantidade']}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="chart-section animate-in" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div className="chart-title" style={{ fontSize: '16px' }}>📊 Resumo por Zona</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {regionData.map((r, i) => (
+                    <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: PIE_COLORS[i % PIE_COLORS.length], flexShrink: 0 }} />
+                      <span style={{ flex: 1, fontSize: '13px', fontWeight: 600 }}>{r.name}</span>
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '14px', fontWeight: 700, color: PIE_COLORS[i % PIE_COLORS.length] }}>{r.value}</span>
+                      <div style={{ width: '80px', height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{ width: `${(r.value / Math.max(...regionData.map(x => x.value))) * 100}%`, height: '100%', background: PIE_COLORS[i % PIE_COLORS.length], borderRadius: '3px', transition: 'width 1s ease' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* === OPPORTUNITIES === */}
           <div className="cards-section">
             <div className="cards-header">
@@ -421,11 +537,51 @@ export default function Home() {
                 </div>
               </div>
             ) : (
+              <>
               <div className="cards-grid">
-                {filteredLots.map((lot, idx) => (
-                  <OpportunityCard key={lot.id} lot={lot} rank={idx + 1} expanded={expandedCard === lot.id} onToggle={() => setExpandedCard(expandedCard === lot.id ? null : lot.id)} />
+                {paginatedLots.map((lot, idx) => (
+                  <OpportunityCard key={lot.id} lot={lot} rank={(currentPage - 1) * ITEMS_PER_PAGE + idx + 1} expanded={expandedCard === lot.id} onToggle={() => setExpandedCard(expandedCard === lot.id ? null : lot.id)} />
                 ))}
               </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '12px',
+                  marginTop: '24px',
+                  padding: '16px',
+                }}>
+                  <button className="btn btn-sm" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                    style={{ opacity: currentPage === 1 ? 0.4 : 1 }}>← Anterior</button>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                      let page: number;
+                      if (totalPages <= 7) { page = i + 1; }
+                      else if (currentPage <= 4) { page = i + 1; }
+                      else if (currentPage >= totalPages - 3) { page = totalPages - 6 + i; }
+                      else { page = currentPage - 3 + i; }
+                      return (
+                        <button key={page} onClick={() => setCurrentPage(page)}
+                          style={{
+                            width: '36px', height: '36px', borderRadius: '8px',
+                            border: page === currentPage ? '1px solid var(--primary)' : '1px solid var(--border)',
+                            background: page === currentPage ? 'var(--primary-glow-strong)' : 'var(--bg-card)',
+                            color: page === currentPage ? 'var(--primary)' : 'var(--text-muted)',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                            transition: 'all 0.2s',
+                          }}>{page}</button>
+                      );
+                    })}
+                  </div>
+                  <button className="btn btn-sm" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                    style={{ opacity: currentPage === totalPages ? 0.4 : 1 }}>Próximo →</button>
+                </div>
+              )}
+              </>
             )}
           </div>
 
@@ -489,6 +645,10 @@ function OpportunityCard({ lot, rank, expanded, onToggle }: { lot: AuctionLot; r
         <span className="badge badge-tipo">{lot.tipoLeilao}</span>
         <span className="badge badge-source">{lot.source}</span>
         <span className={`badge badge-roi ${roiClass}`}>ROI {formatPercent(a.roiEstimado)}</span>
+        {(() => {
+          const conf = getConfidence(lot);
+          return <span className="badge" style={{ background: `${conf.color}15`, color: conf.color, border: `1px solid ${conf.color}30`, fontSize: '10px' }}>{conf.level === 'high' ? '🟢' : conf.level === 'medium' ? '🟡' : '🔴'} Confiança {conf.label}</span>;
+        })()}
       </div>
 
       <div className="card-financials">
