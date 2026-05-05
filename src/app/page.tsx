@@ -680,21 +680,9 @@ function OpportunityCard({ lot, rank, expanded, onToggle, isFavorite, onToggleFa
   const a = lot.analysis;
   if (!a) return null;
 
-  const [simLance, setSimLance] = useState<number | null>(null);
   const days = daysUntil(lot.dataLeilao);
   const daysLabel = days > 0 ? `em ${days} dia${days !== 1 ? 's' : ''}` : days === 0 ? 'HOJE' : 'Encerrado';
   const roiClass = a.roiEstimado >= 50 ? 'high' : '';
-
-  // Simulated values
-  const simValues = useMemo(() => {
-    if (simLance === null) return null;
-    const custos = simLance * 0.1075; // 5% + 4% + 1.75%
-    const invTotal = simLance + custos;
-    const lucro = a.valorMercadoEstimado - invTotal;
-    const roi = (lucro / invTotal) * 100;
-    return { invTotal, lucro, roi };
-  }, [simLance, a.valorMercadoEstimado]);
-
   return (
     <div className={`opportunity-card animate-in ${expanded ? 'expanded' : ''}`} onClick={onToggle}>
       <div className="card-rank">{rank}</div>
@@ -811,31 +799,6 @@ function OpportunityCard({ lot, rank, expanded, onToggle, isFavorite, onToggleFa
               <a href={lot.sourceUrl} target="_blank" rel="noopener noreferrer" className="card-link" onClick={e => e.stopPropagation()}>🔗 Ver no site do leiloeiro →</a>
             </div>
           )}
-
-          {/* === LANCE SIMULATOR === */}
-          <div style={{
-            marginTop: '16px', padding: '14px',
-            background: 'rgba(0, 255, 163, 0.05)',
-            border: '1px solid rgba(0, 255, 163, 0.15)',
-            borderRadius: '10px',
-          }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🎯 Simulador de Lance</div>
-            <input
-              type="range"
-              min={Math.floor(a.lanceConsiderado * 0.5)}
-              max={Math.floor(a.lanceConsiderado * 2)}
-              step={1000}
-              value={simLance ?? a.lanceConsiderado}
-              onChange={e => setSimLance(Number(e.target.value))}
-              style={{ width: '100%', accentColor: '#00FFA3', cursor: 'pointer' }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              <span>Meu lance: <strong style={{ color: 'var(--primary)', fontFamily: "'JetBrains Mono', monospace" }}>{formatCurrency(simLance ?? a.lanceConsiderado)}</strong></span>
-              <span style={{ color: simValues ? (simValues.roi > a.roiEstimado ? '#FF3366' : '#00FFA3') : 'inherit' }}>
-                {simValues ? `ROI: ${formatPercent(simValues.roi)} | Lucro: ${formatCurrency(simValues.lucro)}` : `Original: ROI ${formatPercent(a.roiEstimado)}`}
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </div>
