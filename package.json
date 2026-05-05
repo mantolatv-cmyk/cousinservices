@@ -12,6 +12,7 @@
     "analise": "tsx src/scripts/analise.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@types/leaflet": "^1.9.21",
     "cheerio": "^1.2.0",
     "leaflet": "^1.9.4",

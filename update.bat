@@ -27,9 +27,16 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 echo.
+echo [3/3] Sincronizando com GitHub...
+echo.
+git add leiloes.json analise-resultado.json reports/*
+git commit -m "data: update auction listings and financial analysis %DATE% %TIME%"
+git push https://github.com/mantolatv-cmyk/cousinservices.git main
+
+echo.
 echo ══════════════════════════════════════════════════════════
-echo ✅ Pipeline completo! Dashboard atualizado com dados frescos.
-echo    Abra http://localhost:3000 para visualizar.
+echo ✅ Pipeline completo! Dados sincronizados no GitHub.
+echo    Abra http://localhost:3000 para visualizar localmente.
 echo ══════════════════════════════════════════════════════════
 echo.
 pause

@@ -416,11 +416,65 @@ function processCommand(input: string): string {
   return `🤖 Não entendi o comando "${trimmed}".\n\nDigite \`/ajuda\` para ver os comandos disponíveis.`;
 }
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+async function getGeminiResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
+  try {
+    const top5 = contextItems
+      .sort((a, b) => (b.roiEstimado || 0) - (a.roiEstimado || 0))
+      .slice(0, 5)
+      .map((item, i) => `#${i+1}: ${item.bairro}/${item.cidade} - ROI ${item.roiEstimado.toFixed(1)}% - Lance ${fmt(item.lanceInicial)}`)
+      .join('\n');
+
+    const prompt = `
+      Você é o AgentBot, um assistente virtual especialista em leilões de imóveis (terrenos) para a plataforma CousinServices.
+      Seu objetivo é ajudar investidores a encontrar as melhores oportunidades.
+      
+      CONTEXTO ATUAL (Top 5 Oportunidades):
+      ${top5}
+      
+      TOTAL DE TERRENOS NO BANCO: ${contextItems.length}
+      
+      INSTRUÇÕES:
+      - Responda de forma profissional, executiva e direta.
+      - Use emojis para facilitar a leitura.
+      - Se o usuário perguntar sobre algo geral, use o contexto acima.
+      - Se ele pedir para filtrar ou buscar algo específico que não está no Top 5, sugira que ele use os comandos:
+        /buscar [cidade], /top [n], /barato, /urgente.
+      - Não invente dados. Se não souber, diga que não encontrou nos dados atuais.
+      - Mantenha as respostas curtas e objetivas.
+      
+      PERGUNTA DO USUÁRIO: "${userMessage}"
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (err) {
+    console.error('Gemini Error:', err);
+    return "🤖 Desculpe, estou com dificuldade de processar sua solicitação agora. Tente usar um dos meus comandos (/ajuda).";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const message = body.message || '';
-    const response = processCommand(message);
+    const itemsData = loadAnalysisData();
+    const items = itemsData?.items || [];
+
+    // Check if it's a command
+    if (message.startsWith('/')) {
+      const response = processCommand(message);
+      return NextResponse.json({ response });
+    }
+
+    // Otherwise, use Gemini for natural language
+    const response = await getGeminiResponse(message, items);
     return NextResponse.json({ response });
   } catch (err) {
     return NextResponse.json(
