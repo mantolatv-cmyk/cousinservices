@@ -260,6 +260,8 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function getGeminiResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
+  console.log('Bot API: Checking Key...', process.env.GOOGLE_AI_KEY ? 'Present' : 'MISSING');
+  
   if (!process.env.GOOGLE_AI_KEY || process.env.GOOGLE_AI_KEY.length < 10) {
     return "🤖 Modo offline (API Key não detectada). Use comandos como `/buscar` ou `/ajuda`.";
   }
