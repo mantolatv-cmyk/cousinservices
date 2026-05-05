@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, Legend, PieChart, Pie } from 'recharts';
 import { getAllZonas } from '@/data/spRegions';
 import { formatCurrency, formatCurrencyCompact, formatPercent, formatArea, formatDate, formatDateTime, daysUntil, getAttentionPoints } from '@/lib/format';
 import ChatBot from '@/components/ChatBot';
 import type { AuctionLot, FilterState, ScrapingStatus as ScrapingStatusType } from '@/lib/types';
+
+const HeatMap = dynamic(() => import('@/components/HeatMap'), { ssr: false, loading: () => <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8' }}>Carregando mapa...</div> });
 
 // ===================== CONFIDENCE SEMAPHORE =====================
 function getConfidence(lot: AuctionLot): { level: 'high' | 'medium' | 'low'; label: string; color: string } {
@@ -58,6 +61,30 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState<string>('all');
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [isDark, setIsDark] = useState(true);
+
+  // Load favorites from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cs-favorites');
+      if (saved) setFavorites(new Set(JSON.parse(saved)));
+    } catch {}
+  }, []);
+
+  const toggleFavorite = useCallback((id: string) => {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      localStorage.setItem('cs-favorites', JSON.stringify([...next]));
+      return next;
+    });
+  }, []);
+
+  // Dark/Light mode
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   // ===================== FETCH DATA FROM API =====================
   const fetchLots = useCallback(async () => {
@@ -225,6 +252,9 @@ export default function Home() {
           </div>
           <button className="btn btn-primary" onClick={handleRefresh} disabled={isRefreshing}>
             {isRefreshing ? '⟳ Atualizando…' : '⟳ Atualizar Dados'}
+          </button>
+          <button className="btn btn-sm" onClick={() => setIsDark(!isDark)} title="Alternar tema" style={{ fontSize: '16px', padding: '8px 12px' }}>
+            {isDark ? '☀️' : '🌙'}
           </button>
         </div>
       </header>
@@ -515,6 +545,32 @@ export default function Home() {
             </div>
           )}
 
+          {/* === HEAT MAP === */}
+          <div className="chart-section animate-in">
+            <div className="chart-title" style={{ fontSize: '16px' }}>📍 Mapa de Oportunidades — São Paulo</div>
+            <HeatMap lots={filteredLots} />
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#00FFA3', marginRight: '4px' }}/>ROI ≥ 200%</span>
+              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#00E0FF', marginRight: '4px' }}/>ROI 100-200%</span>
+              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#FFB800', marginRight: '4px' }}/>ROI 50-100%</span>
+              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#FF3366', marginRight: '4px' }}/>ROI &lt; 50%</span>
+            </div>
+          </div>
+
+          {/* === FAVORITES SECTION === */}
+          {favorites.size > 0 && (
+            <div className="cards-section">
+              <div className="cards-header">
+                <div className="cards-title">⭐ Meus Favoritos <span className="cards-count">— {favorites.size} salvo{favorites.size !== 1 ? 's' : ''}</span></div>
+              </div>
+              <div className="cards-grid">
+                {filteredLots.filter(l => favorites.has(l.id)).map((lot, idx) => (
+                  <OpportunityCard key={`fav-${lot.id}`} lot={lot} rank={idx + 1} expanded={expandedCard === lot.id} onToggle={() => setExpandedCard(expandedCard === lot.id ? null : lot.id)} isFavorite={true} onToggleFavorite={() => toggleFavorite(lot.id)} />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* === OPPORTUNITIES === */}
           <div className="cards-section">
             <div className="cards-header">
@@ -540,7 +596,7 @@ export default function Home() {
               <>
               <div className="cards-grid">
                 {paginatedLots.map((lot, idx) => (
-                  <OpportunityCard key={lot.id} lot={lot} rank={(currentPage - 1) * ITEMS_PER_PAGE + idx + 1} expanded={expandedCard === lot.id} onToggle={() => setExpandedCard(expandedCard === lot.id ? null : lot.id)} />
+                  <OpportunityCard key={lot.id} lot={lot} rank={(currentPage - 1) * ITEMS_PER_PAGE + idx + 1} expanded={expandedCard === lot.id} onToggle={() => setExpandedCard(expandedCard === lot.id ? null : lot.id)} isFavorite={favorites.has(lot.id)} onToggleFavorite={() => toggleFavorite(lot.id)} />
                 ))}
               </div>
 
@@ -620,17 +676,41 @@ export default function Home() {
 }
 
 // ===================== OPPORTUNITY CARD =====================
-function OpportunityCard({ lot, rank, expanded, onToggle }: { lot: AuctionLot; rank: number; expanded: boolean; onToggle: () => void }) {
+function OpportunityCard({ lot, rank, expanded, onToggle, isFavorite, onToggleFavorite }: { lot: AuctionLot; rank: number; expanded: boolean; onToggle: () => void; isFavorite?: boolean; onToggleFavorite?: () => void }) {
   const a = lot.analysis;
   if (!a) return null;
 
+  const [simLance, setSimLance] = useState<number | null>(null);
   const days = daysUntil(lot.dataLeilao);
   const daysLabel = days > 0 ? `em ${days} dia${days !== 1 ? 's' : ''}` : days === 0 ? 'HOJE' : 'Encerrado';
   const roiClass = a.roiEstimado >= 50 ? 'high' : '';
 
+  // Simulated values
+  const simValues = useMemo(() => {
+    if (simLance === null) return null;
+    const custos = simLance * 0.1075; // 5% + 4% + 1.75%
+    const invTotal = simLance + custos;
+    const lucro = a.valorMercadoEstimado - invTotal;
+    const roi = (lucro / invTotal) * 100;
+    return { invTotal, lucro, roi };
+  }, [simLance, a.valorMercadoEstimado]);
+
   return (
     <div className={`opportunity-card animate-in ${expanded ? 'expanded' : ''}`} onClick={onToggle}>
       <div className="card-rank">{rank}</div>
+      {/* Favorite Button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggleFavorite?.(); }}
+        style={{
+          position: 'absolute', top: '16px', right: '56px', zIndex: 3,
+          background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer',
+          filter: isFavorite ? 'none' : 'grayscale(1) opacity(0.4)',
+          transition: 'all 0.2s',
+        }}
+        title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+      >
+        {isFavorite ? '⭐' : '☆'}
+      </button>
 
       <div className="card-header">
         <div className="card-icon">📍</div>
@@ -731,6 +811,31 @@ function OpportunityCard({ lot, rank, expanded, onToggle }: { lot: AuctionLot; r
               <a href={lot.sourceUrl} target="_blank" rel="noopener noreferrer" className="card-link" onClick={e => e.stopPropagation()}>🔗 Ver no site do leiloeiro →</a>
             </div>
           )}
+
+          {/* === LANCE SIMULATOR === */}
+          <div style={{
+            marginTop: '16px', padding: '14px',
+            background: 'rgba(0, 255, 163, 0.05)',
+            border: '1px solid rgba(0, 255, 163, 0.15)',
+            borderRadius: '10px',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🎯 Simulador de Lance</div>
+            <input
+              type="range"
+              min={Math.floor(a.lanceConsiderado * 0.5)}
+              max={Math.floor(a.lanceConsiderado * 2)}
+              step={1000}
+              value={simLance ?? a.lanceConsiderado}
+              onChange={e => setSimLance(Number(e.target.value))}
+              style={{ width: '100%', accentColor: '#00FFA3', cursor: 'pointer' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+              <span>Meu lance: <strong style={{ color: 'var(--primary)', fontFamily: "'JetBrains Mono', monospace" }}>{formatCurrency(simLance ?? a.lanceConsiderado)}</strong></span>
+              <span style={{ color: simValues ? (simValues.roi > a.roiEstimado ? '#FF3366' : '#00FFA3') : 'inherit' }}>
+                {simValues ? `ROI: ${formatPercent(simValues.roi)} | Lucro: ${formatCurrency(simValues.lucro)}` : `Original: ROI ${formatPercent(a.roiEstimado)}`}
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>

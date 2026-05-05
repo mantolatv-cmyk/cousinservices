@@ -838,3 +838,75 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* === LIGHT THEME === */
+[data-theme="light"] {
+  --primary: #059669;
+  --primary-light: #10B981;
+  --primary-dark: #047857;
+  --primary-glow: rgba(5, 150, 105, 0.1);
+  --primary-glow-strong: rgba(5, 150, 105, 0.2);
+  --accent: #D97706;
+  --accent-light: #F59E0B;
+  --bg-base: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F1F5F9;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: rgba(241, 245, 249, 1);
+  --bg-glass: rgba(255, 255, 255, 0.8);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.15);
+  --border-active: rgba(5, 150, 105, 0.5);
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-accent: #059669;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.15);
+  --shadow-glow: 0 0 20px rgba(5, 150, 105, 0.1);
+  --success: #059669;
+  --info: #0284C7;
+}
+
+[data-theme="light"] body { color: var(--text-primary); background: var(--bg-base); }
+[data-theme="light"] body::before { background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(5,150,105,0.05) 0%, transparent 60%); }
+[data-theme="light"] .header-title { background: linear-gradient(135deg, #0F172A 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+[data-theme="light"] .chart-section { background: rgba(255,255,255,0.8); border-color: rgba(5,150,105,0.2); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+[data-theme="light"] .chart-title { background: linear-gradient(135deg, #0F172A 0%, #059669 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+[data-theme="light"] .opportunity-card { background: rgba(255,255,255,0.95); }
+[data-theme="light"] .btn-primary { color: white; }
+[data-theme="light"] ::selection { background: #059669; color: white; }
+
+/* === Leaflet Container Override === */
+.leaflet-container {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+/* === Enhanced Mobile === */
+@media (max-width: 1024px) {
+  .app-container { padding: 0 16px; }
+}
+
+@media (max-width: 768px) {
+  .header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px 0; }
+  .header-actions { width: 100%; justify-content: space-between; }
+  .metrics-bar { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .filter-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .filter-divider { display: none; }
+  .filter-select { min-width: unset; width: 100%; }
+  .card-financials { grid-template-columns: 1fr; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .metric-value { font-size: 18px; }
+  .chart-section { padding: 16px; }
+  .scraping-grid { grid-template-columns: 1fr; }
+  .cards-title { font-size: 15px; }
+}
+
+@media (max-width: 480px) {
+  .metrics-bar { grid-template-columns: 1fr; }
+  .header-title { font-size: 18px; }
+  .metric-card { padding: 14px; }
+}
