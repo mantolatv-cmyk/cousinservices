@@ -5,6 +5,7 @@
 
 import { PortalZukScraper } from './portalZuk';
 import { MegaLeiloesScraper } from './megaLeiloes';
+import { BiasiLeiloesScraper } from './biasiLeiloes';
 // import { CaixaImoveisScraper } from './caixaImoveis';
 import { BaseScraper, ScrapedLot } from './base';
 
@@ -20,6 +21,7 @@ export async function runAllScrapers(): Promise<ScrapeResult[]> {
   const scrapers: BaseScraper[] = [
     new PortalZukScraper(),
     new MegaLeiloesScraper(),
+    new BiasiLeiloesScraper(),
     // new CaixaImoveisScraper(),
   ];
 

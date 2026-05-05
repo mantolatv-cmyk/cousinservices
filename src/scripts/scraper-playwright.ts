@@ -381,6 +381,79 @@ async function scrapeMegaLeiloes(page: Page): Promise<LeilaoItem[]> {
   return items;
 }
 
+// ===================== BIASI LEILÕES =====================
+async function scrapeBiasiLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Biasi Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.biasileiloes.com.br/imoveis/sp/todas-as-cidades/todos-os-bairros/terrenos/', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(5000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{
+        title: string;
+        prices: string[];
+        link: string;
+        fullText: string;
+      }> = [];
+
+      const cards = document.querySelectorAll('a.leilao-lote');
+      
+      cards.forEach(card => {
+        const el = card as HTMLAnchorElement;
+        const text = el.innerText || '';
+        const title = el.querySelector('h5')?.textContent?.trim() || '';
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title,
+          prices: prices.map(p => p.trim()),
+          link: el.href,
+          fullText: text.substring(0, 400)
+        });
+      });
+      return results;
+    });
+
+    console.log(`  [Biasi Leilões] ${rawItems.length} cards encontrados`);
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `biasi-pw-${i}-${Date.now()}`,
+        fonte: 'Biasi Leilões',
+        url: r.link || 'https://www.biasileiloes.com.br',
+        endereco: r.title || 'São Paulo',
+        bairro: r.title || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.5,
+        status: 'Aberto',
+        tipoLeilao: 'Extrajudicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Biasi Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Biasi Leilões] Erro: ${(err as Error).message}`);
+  }
+
+  console.log(`  [Biasi Leilões] ✅ ${items.length} terrenos extraídos`);
+  return items;
+}
+
 function extractDate(text: string): string {
   const match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
   if (match) return `${match[3]}-${match[2]}-${match[1]}T14:00:00`;
@@ -408,7 +481,8 @@ async function main() {
     { name: 'Zukerman', fn: scrapeZukerman },
     { name: 'Mega Leilões', fn: scrapeMegaLeiloes },
     { name: 'Sodré Santoro', fn: scrapeSodreSantoro },
-    { name: 'Freitas Leiloeiro', fn: scrapeFreitasLeiloeiro }
+    { name: 'Freitas Leiloeiro', fn: scrapeFreitasLeiloeiro },
+    { name: 'Biasi Leilões', fn: scrapeBiasiLeiloes }
   ];
 
   for (const source of sources) {
@@ -439,6 +513,7 @@ async function main() {
   console.log(`  Mega Leilões:      ${allItems.filter(i => i.fonte.includes('Mega')).length} terrenos`);
   console.log(`  Sodré Santoro:     ${allItems.filter(i => i.fonte.includes('Sodré')).length} terrenos`);
   console.log(`  Freitas Leiloeiro: ${allItems.filter(i => i.fonte.includes('Freitas')).length} terrenos`);
+  console.log(`  Biasi Leilões:     ${allItems.filter(i => i.fonte.includes('Biasi')).length} terrenos`);
   console.log(`  TOTAL:             ${allItems.length} terrenos`);
   console.log(`\n💾 Dados salvos em: ${outputPath}`);
   console.log(`\n✅ Scraping completo!\n`);

@@ -8,7 +8,7 @@ import { formatCurrency, formatCurrencyCompact, formatPercent, formatArea, forma
 import ChatBot from '@/components/ChatBot';
 import type { AuctionLot, FilterState, ScrapingStatus as ScrapingStatusType } from '@/lib/types';
 
-const HeatMap = dynamic(() => import('@/components/HeatMap'), { ssr: false, loading: () => <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8' }}>Carregando mapa...</div> });
+
 
 // ===================== CONFIDENCE SEMAPHORE =====================
 function getConfidence(lot: AuctionLot): { level: 'high' | 'medium' | 'low'; label: string; color: string } {
@@ -52,7 +52,7 @@ export default function Home() {
     zona: 'Todas',
     roiMinimo: 20,
     tipoLeilao: 'Todos',
-    ordenarPor: 'roi',
+    ordenarPor: 'confianca',
     areaMinima: 0,
     areaMaxima: 100000,
   });
@@ -154,12 +154,19 @@ export default function Home() {
       const aa = a.analysis, bb = b.analysis;
       if (!aa || !bb) return 0;
       switch (sortBy) {
+        case 'confianca': {
+          const scoreA = getConfidence(a).level === 'high' ? 3 : getConfidence(a).level === 'medium' ? 2 : 1;
+          const scoreB = getConfidence(b).level === 'high' ? 3 : getConfidence(b).level === 'medium' ? 2 : 1;
+          if (scoreA !== scoreB) return scoreB - scoreA;
+          return bb.scoreComposto - aa.scoreComposto;
+        }
         case 'roi': return bb.scoreComposto - aa.scoreComposto;
         case 'desagio': return bb.desagio - aa.desagio;
         case 'preco': return aa.investimentoTotal - bb.investimentoTotal;
         case 'area': return b.areaM2 - a.areaM2;
         default: return bb.scoreComposto - aa.scoreComposto;
       }
+
     });
 
     return lots;
@@ -384,6 +391,7 @@ export default function Home() {
             <div className="filter-group">
               <label className="filter-label">Ordenar por</label>
               <select className="filter-select" value={filters.ordenarPor || 'roi'} onChange={e => updateFilter('ordenarPor', e.target.value)}>
+                <option value="confianca">Confiança</option>
                 <option value="roi">Maior ROI</option>
                 <option value="desagio">Maior Deságio</option>
                 <option value="preco">Menor Preço</option>
@@ -561,17 +569,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* === HEAT MAP === */}
-          <div className="chart-section animate-in">
-            <div className="chart-title" style={{ fontSize: '16px' }}>📍 Mapa de Oportunidades — São Paulo</div>
-            <HeatMap lots={filteredLots} />
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#00FFA3', marginRight: '4px' }}/>ROI ≥ 200%</span>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#00E0FF', marginRight: '4px' }}/>ROI 100-200%</span>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#FFB800', marginRight: '4px' }}/>ROI 50-100%</span>
-              <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: '#FF3366', marginRight: '4px' }}/>ROI &lt; 50%</span>
-            </div>
-          </div>
 
           {/* === FAVORITES SECTION === */}
           {favorites.size > 0 && (

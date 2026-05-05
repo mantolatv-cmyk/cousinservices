@@ -76,6 +76,7 @@ export interface InvestmentAnalysis {
 export type AuctionSource =
   | 'Portal Zuk'
   | 'Mega Leilões'
+  | 'Biasi Leilões'
   | 'Sodré Santoro'
   | 'Milan Leilões'
   | 'Freitas Leiloeiro'
@@ -96,7 +97,7 @@ export interface FilterState {
   areaMinima: number;
   areaMaxima: number;
   tipoLeilao: string;
-  ordenarPor: 'roi' | 'desagio' | 'preco' | 'area';
+  ordenarPor: 'roi' | 'desagio' | 'preco' | 'area' | 'confianca';
 }
 
 export interface DashboardMetrics {
