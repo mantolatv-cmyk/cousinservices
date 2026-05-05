@@ -8,7 +8,6 @@
 import { chromium, Page } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
-import { scrapeCaixa } from '../lib/scrapers/caixaImoveis';
 
 export interface LeilaoItem {
   id: string;
@@ -161,19 +160,20 @@ async function scrapeSodreSantoro(page: Page): Promise<LeilaoItem[]> {
         fullText: string;
       }> = [];
 
-      // Select cards - based on a.wrapper or similar elements observed
-      const cards = document.querySelectorAll('a.wrapper, [class*="card"], [class*="LotCard"]');
+      // Select cards - based on findings: a.wrapper[href*="/lote/"]
+      const cards = document.querySelectorAll('a.wrapper[href*="/lote/"], [class*="LotCard"]');
       
       cards.forEach(card => {
         const el = card as HTMLElement;
         const text = el.innerText || '';
-        if (!text.match(/terreno|lote/i)) return;
+        const title = el.getAttribute('title') || el.querySelector('[class*="text-body"]')?.textContent?.trim() || '';
         
         const link = (el instanceof HTMLAnchorElement ? el.href : el.querySelector('a')?.href) || '';
+        // Price is usually in a text-headline element
         const prices = text.match(/R\$\s*[\d.,]+/g) || [];
 
         results.push({
-          title: el.querySelector('[class*="text-on-surface"], h2, h3')?.textContent?.trim() || '',
+          title,
           prices: prices.map(p => p.trim()),
           link,
           fullText: text.substring(0, 400)
@@ -298,11 +298,12 @@ async function scrapeMegaLeiloes(page: Page): Promise<LeilaoItem[]> {
   console.log('\n🔍 [Mega Leilões] Iniciando scraping...');
 
   try {
-    await page.goto('https://www.megaleiloes.com.br/origens/imoveis?tipo=Terreno&uf=SP', {
+    // URL updated based on recent verification
+    await page.goto('https://www.megaleiloes.com.br/imoveis/terrenos-e-lotes/sp', {
       waitUntil: 'networkidle',
       timeout: 30000,
     });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(5000);
 
     const rawItems = await page.evaluate(() => {
       const results: Array<{
@@ -314,25 +315,28 @@ async function scrapeMegaLeiloes(page: Page): Promise<LeilaoItem[]> {
         fullText: string;
       }> = [];
 
-      const cards = document.querySelectorAll('[class*="card"], [class*="lote"], [class*="item"], article, [class*="product"]');
+      // Updated selectors for Mega Leilões
+      const cards = document.querySelectorAll('.card, .card-item, [class*="lote"]');
 
       cards.forEach(card => {
         const el = card as HTMLElement;
         const text = el.innerText || '';
-        if (!text.match(/terreno|lote|terra/i)) return;
-        if (text.length < 30) return;
-
+        
+        const titleEl = el.querySelector('a.card-title, h2, h3');
+        const priceEl = el.querySelector('div.card-price, .price');
+        const localityEl = el.querySelector('a.card-locality, .locality');
         const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        
         const prices = text.match(/R\$\s*[\d.,]+/g) || [];
         const areaMatch = text.match(/[\d.,]+\s*m[²2]/i);
 
         results.push({
-          title: el.querySelector('h2,h3,h4,[class*="title"]')?.textContent?.trim() || '',
-          endereco: text.substring(0, 150),
+          title: titleEl?.textContent?.trim() || '',
+          endereco: localityEl?.textContent?.trim() || text.substring(0, 100),
           prices: prices.map(p => p.trim()),
           area: areaMatch?.[0] || '',
           link: linkEl?.href || '',
-          fullText: text.substring(0, 300),
+          fullText: text.substring(0, 400),
         });
       });
 
@@ -399,9 +403,8 @@ async function main() {
 
   const allItems: LeilaoItem[] = [];
 
-  // Scrapers Execution
+  // Scrapers Execution - reordered to put Caixa last as it's the most unstable
   const sources = [
-    { name: 'Caixa Econômica', fn: scrapeCaixa },
     { name: 'Zukerman', fn: scrapeZukerman },
     { name: 'Mega Leilões', fn: scrapeMegaLeiloes },
     { name: 'Sodré Santoro', fn: scrapeSodreSantoro },
@@ -409,10 +412,14 @@ async function main() {
   ];
 
   for (const source of sources) {
-    const page = await context.newPage();
-    const items = await source.fn(page);
-    allItems.push(...items);
-    await page.close();
+    try {
+      const page = await context.newPage();
+      const items = await source.fn(page);
+      allItems.push(...items);
+      await page.close();
+    } catch (err) {
+      console.error(`⚠️ Erro ao processar fonte ${source.name}: ${(err as Error).message}. Pulando...`);
+    }
   }
 
   await browser.close();
@@ -432,7 +439,6 @@ async function main() {
   console.log(`  Mega Leilões:      ${allItems.filter(i => i.fonte.includes('Mega')).length} terrenos`);
   console.log(`  Sodré Santoro:     ${allItems.filter(i => i.fonte.includes('Sodré')).length} terrenos`);
   console.log(`  Freitas Leiloeiro: ${allItems.filter(i => i.fonte.includes('Freitas')).length} terrenos`);
-  console.log(`  Caixa Econômica:   ${allItems.filter(i => i.fonte.includes('Caixa')).length} terrenos`);
   console.log(`  TOTAL:             ${allItems.length} terrenos`);
   console.log(`\n💾 Dados salvos em: ${outputPath}`);
   console.log(`\n✅ Scraping completo!\n`);
