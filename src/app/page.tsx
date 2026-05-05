@@ -219,8 +219,24 @@ export default function Home() {
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await fetchLots();
-    setIsRefreshing(false);
+    try {
+      // 1. Trigger the server-side update (scraping + analysis + git push)
+      const res = await fetch('/api/update', { method: 'POST' });
+      const result = await res.json();
+      
+      if (result.success) {
+        // 2. Refresh the UI with the newly generated data
+        await fetchLots();
+        alert('🚀 Atualização Completa!\nNovos dados coletados, analisados e sincronizados no GitHub.');
+      } else {
+        alert('⚠️ Houve um problema na atualização:\n' + result.message);
+      }
+    } catch (err) {
+      console.error('Update failed:', err);
+      alert('❌ Erro de conexão ao tentar atualizar os dados.');
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [fetchLots]);
 
   const updateFilter = useCallback((key: keyof FilterState, value: string | number) => {
