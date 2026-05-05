@@ -1,0 +1,43 @@
+name: Update Auction Data
+
+on:
+  workflow_dispatch: # Permite rodar manualmente no GitHub
+  repository_dispatch:
+    types: [update_data] # Permite o botão do site ativar este robô
+  schedule:
+    - cron: '0 0 * * *' # Roda automaticamente todo dia à meia-noite
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Scraper
+        run: npm run scrape:pw
+        env:
+          GOOGLE_AI_KEY: ${{ secrets.GOOGLE_AI_KEY }}
+
+      - name: Run Analysis
+        run: npm run analise
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "CousinBot"
+          git config --global user.email "bot@cousinservices.com"
+          git add leiloes.json analise-resultado.json reports/
+          git commit -m "data: automated update from GitHub Action [$(date +'%Y-%m-%d %H:%M')]" || echo "No changes to commit"
+          git push
