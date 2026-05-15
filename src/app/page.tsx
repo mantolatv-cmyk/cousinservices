@@ -61,6 +61,7 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState<string>('all');
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [isDark, setIsDark] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [aiSettings, setAiSettings] = useState({
