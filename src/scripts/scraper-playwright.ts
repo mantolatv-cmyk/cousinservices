@@ -647,6 +647,199 @@ async function scrapeFrazaoLeiloes(page: Page): Promise<LeilaoItem[]> {
   return items;
 }
 
+// ===================== GRUPO LANCE =====================
+async function scrapeGrupoLance(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Grupo Lance] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.grupolance.com.br/leiloes/imoveis/terrenos/sp', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card-leilao, .item-leilao, [class*="lote"]');
+      
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('.titulo, h3, h4')?.textContent?.trim() || 'Terreno Grupo Lance',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400)
+        });
+      });
+      return results;
+    });
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `grupolance-pw-${i}-${Date.now()}`,
+        fonte: 'Grupo Lance',
+        url: r.link || 'https://www.grupolance.com.br',
+        endereco: r.title,
+        bairro: 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.5,
+        status: 'Aberto',
+        tipoLeilao: 'Judicial/Extrajudicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Grupo Lance',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Grupo Lance] Erro: ${(err as Error).message}`);
+  }
+  return items;
+}
+
+// ===================== LEJE (Leilão Judicial Eletrônico) =====================
+async function scrapeLeje(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [LEJE] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.leje.com.br/busca?categoria=2&estado=SP', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card, .lote-item');
+      
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('.title, h5')?.textContent?.trim() || 'Terreno LEJE',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400)
+        });
+      });
+      return results;
+    });
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `leje-pw-${i}-${Date.now()}`,
+        fonte: 'LEJE',
+        url: r.link || 'https://www.leje.com.br',
+        endereco: r.title,
+        bairro: 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.6,
+        status: 'Judicial',
+        tipoLeilao: 'Judicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'LEJE Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [LEJE] Erro: ${(err as Error).message}`);
+  }
+  return items;
+}
+
+// ===================== LEILÃO IMÓVEL (Aggregator) =====================
+async function scrapeLeilaoImovel(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Leilão Imóvel] Iniciando scraping (Agregador)...');
+
+  try {
+    await page.goto('https://www.leilaoimovel.com.br/leilao-de-imoveis/t/terrenos/sp', {
+      waitUntil: 'networkidle',
+      timeout: 60000,
+    });
+    await page.waitForTimeout(5000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string; source: string }> = [];
+      const cards = document.querySelectorAll('article, .card-leilao, [class*="Card"]');
+      
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+        
+        // Try to identify the real source from the card
+        const sourceMatch = text.match(/Leiloeiro:\s*([^\n]+)/) || text.match(/Fonte:\s*([^\n]+)/);
+
+        results.push({
+          title: el.querySelector('h2, h3, .title')?.textContent?.trim() || 'Terreno Agregado',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400),
+          source: sourceMatch?.[1]?.trim() || 'Leiloeiro Parceiro'
+        });
+      });
+      return results;
+    });
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `leilaoimovel-pw-${i}-${Date.now()}`,
+        fonte: `Agregado (${r.source})`,
+        url: r.link || 'https://www.leilaoimovel.com.br',
+        endereco: r.title,
+        bairro: 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: parseCurrency(r.prices[1] || '') || lance * 1.5,
+        status: 'Aberto',
+        tipoLeilao: 'Múltiplo',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: r.source,
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Leilão Imóvel] Erro: ${(err as Error).message}`);
+  }
+  return items;
+}
+
 function extractDate(text: string): string {
   const match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
   if (match) return `${match[3]}-${match[2]}-${match[1]}T14:00:00`;
@@ -678,7 +871,10 @@ async function main() {
     { name: 'Biasi Leilões', fn: scrapeBiasiLeiloes },
     { name: 'Milan Leilões', fn: scrapeMilanLeiloes },
     { name: 'Sato Leilões', fn: scrapeSatoLeiloes },
-    { name: 'Frazão Leilões', fn: scrapeFrazaoLeiloes }
+    { name: 'Frazão Leilões', fn: scrapeFrazaoLeiloes },
+    { name: 'Grupo Lance', fn: scrapeGrupoLance },
+    { name: 'LEJE', fn: scrapeLeje },
+    { name: 'Leilão Imóvel (Agregador)', fn: scrapeLeilaoImovel }
   ];
 
   for (const source of sources) {
@@ -713,6 +909,9 @@ async function main() {
   console.log(`  Milan Leilões:     ${allItems.filter(i => i.fonte.includes('Milan')).length} terrenos`);
   console.log(`  Sato Leilões:      ${allItems.filter(i => i.fonte.includes('Sato')).length} terrenos`);
   console.log(`  Frazão Leilões:    ${allItems.filter(i => i.fonte.includes('Frazão')).length} terrenos`);
+  console.log(`  Grupo Lance:       ${allItems.filter(i => i.fonte.includes('Grupo')).length} terrenos`);
+  console.log(`  LEJE:              ${allItems.filter(i => i.fonte.includes('LEJE')).length} terrenos`);
+  console.log(`  Leilão Imóvel:     ${allItems.filter(i => i.fonte.includes('Agregado')).length} terrenos`);
   console.log(`  TOTAL:             ${allItems.length} terrenos`);
   console.log(`\n💾 Dados salvos em: ${outputPath}`);
   console.log(`\n✅ Scraping completo!\n`);
