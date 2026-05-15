@@ -454,6 +454,199 @@ async function scrapeBiasiLeiloes(page: Page): Promise<LeilaoItem[]> {
   return items;
 }
 
+// ===================== MILAN LEILÕES =====================
+async function scrapeMilanLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Milan Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.milanleiloes.com.br/Leiloes/Agenda.asp?C=3', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card, .box-leilao, [class*="lote"]');
+      
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('h2, h3, .titulo')?.textContent?.trim() || 'Terreno Milan',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400)
+        });
+      });
+      return results;
+    });
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `milan-pw-${i}-${Date.now()}`,
+        fonte: 'Milan Leilões',
+        url: r.link || 'https://www.milanleiloes.com.br',
+        endereco: r.title,
+        bairro: r.title.split('-')[0]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.6,
+        status: 'Aberto',
+        tipoLeilao: 'Extrajudicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Milan Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Milan Leilões] Erro: ${(err as Error).message}`);
+  }
+  return items;
+}
+
+// ===================== SATO LEILÕES =====================
+async function scrapeSatoLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Sato Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.satoleiloes.com.br/Busca?Categoria=2', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card-item, .lote-item');
+      
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('.title, h3')?.textContent?.trim() || 'Terreno Sato',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400)
+        });
+      });
+      return results;
+    });
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `sato-pw-${i}-${Date.now()}`,
+        fonte: 'Sato Leilões',
+        url: r.link || 'https://www.satoleiloes.com.br',
+        endereco: r.title,
+        bairro: 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.5,
+        status: 'Aberto',
+        tipoLeilao: 'Judicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Sato Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Sato Leilões] Erro: ${(err as Error).message}`);
+  }
+  return items;
+}
+
+// ===================== FRAZÃO LEILÕES =====================
+async function scrapeFrazaoLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Frazão Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.frazaoleiloes.com.br/leiloes/imoveis/terrenos/sp', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card, .item-leilao');
+      
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('.titulo, h4')?.textContent?.trim() || 'Terreno Frazão',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400)
+        });
+      });
+      return results;
+    });
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `frazao-pw-${i}-${Date.now()}`,
+        fonte: 'Frazão Leilões',
+        url: r.link || 'https://www.frazaoleiloes.com.br',
+        endereco: r.title,
+        bairro: 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.7,
+        status: 'Aberto',
+        tipoLeilao: 'Extrajudicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Frazão Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Frazão Leilões] Erro: ${(err as Error).message}`);
+  }
+  return items;
+}
+
 function extractDate(text: string): string {
   const match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
   if (match) return `${match[3]}-${match[2]}-${match[1]}T14:00:00`;
@@ -482,7 +675,10 @@ async function main() {
     { name: 'Mega Leilões', fn: scrapeMegaLeiloes },
     { name: 'Sodré Santoro', fn: scrapeSodreSantoro },
     { name: 'Freitas Leiloeiro', fn: scrapeFreitasLeiloeiro },
-    { name: 'Biasi Leilões', fn: scrapeBiasiLeiloes }
+    { name: 'Biasi Leilões', fn: scrapeBiasiLeiloes },
+    { name: 'Milan Leilões', fn: scrapeMilanLeiloes },
+    { name: 'Sato Leilões', fn: scrapeSatoLeiloes },
+    { name: 'Frazão Leilões', fn: scrapeFrazaoLeiloes }
   ];
 
   for (const source of sources) {
@@ -514,6 +710,9 @@ async function main() {
   console.log(`  Sodré Santoro:     ${allItems.filter(i => i.fonte.includes('Sodré')).length} terrenos`);
   console.log(`  Freitas Leiloeiro: ${allItems.filter(i => i.fonte.includes('Freitas')).length} terrenos`);
   console.log(`  Biasi Leilões:     ${allItems.filter(i => i.fonte.includes('Biasi')).length} terrenos`);
+  console.log(`  Milan Leilões:     ${allItems.filter(i => i.fonte.includes('Milan')).length} terrenos`);
+  console.log(`  Sato Leilões:      ${allItems.filter(i => i.fonte.includes('Sato')).length} terrenos`);
+  console.log(`  Frazão Leilões:    ${allItems.filter(i => i.fonte.includes('Frazão')).length} terrenos`);
   console.log(`  TOTAL:             ${allItems.length} terrenos`);
   console.log(`\n💾 Dados salvos em: ${outputPath}`);
   console.log(`\n✅ Scraping completo!\n`);
