@@ -61,14 +61,27 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState<string>('all');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [isDark, setIsDark] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [aiSettings, setAiSettings] = useState({
+    provider: 'gemini',
+    deepseekKey: ''
+  });
 
-  // Load favorites from localStorage
+  // Load favorites and settings from localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('cs-favorites');
-      if (saved) setFavorites(new Set(JSON.parse(saved)));
+      const savedFavs = localStorage.getItem('cs-favorites');
+      if (savedFavs) setFavorites(new Set(JSON.parse(savedFavs)));
+
+      const savedSettings = localStorage.getItem('cs-ai-settings');
+      if (savedSettings) {
+        setAiSettings(JSON.parse(savedSettings));
+      } else {
+        // Pre-fill with the provided key if available in the environment or as a fallback
+        // For now, just a placeholder or the one from user if we want to be helpful
+        // But better to let them paste it or get it from .env on backend
+      }
     } catch {}
   }, []);
 
@@ -275,6 +288,9 @@ export default function Home() {
           </div>
           <button className="btn btn-primary" onClick={handleRefresh} disabled={isRefreshing}>
             {isRefreshing ? '⟳ Atualizando…' : '⟳ Atualizar Dados'}
+          </button>
+          <button className="btn btn-sm" onClick={() => setIsSettingsOpen(true)} title="Configurações AI">
+            ⚙️
           </button>
           <button className="btn btn-sm" onClick={() => setIsDark(!isDark)} title="Alternar tema" style={{ fontSize: '16px', padding: '8px 12px' }}>
             {isDark ? '☀️' : '🌙'}
@@ -684,6 +700,67 @@ export default function Home() {
 
       {/* === AGENT BOT === */}
       <ChatBot onBotFilter={handleBotFilter} activeBotFilter={botFilter} />
+
+      {/* === SETTINGS MODAL === */}
+      {isSettingsOpen && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)', zIndex: 10000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          animation: 'fadeIn 0.3s ease'
+        }}>
+          <div style={{
+            width: '450px', background: 'var(--bg-surface)',
+            border: '1px solid var(--border-active)', borderRadius: 'var(--radius-lg)',
+            padding: '32px', boxShadow: 'var(--shadow-lg)'
+          }}>
+            <h2 style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              ⚙️ Configurações AI
+            </h2>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase' }}>
+                Provedor de IA
+              </label>
+              <select 
+                className="filter-select" 
+                style={{ width: '100%' }}
+                value={aiSettings.provider}
+                onChange={e => setAiSettings(prev => ({ ...prev, provider: e.target.value }))}
+              >
+                <option value="gemini">Google Gemini (Padrão)</option>
+                <option value="deepseek">DeepSeek AI</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', textTransform: 'uppercase' }}>
+                DeepSeek API Key
+              </label>
+              <input 
+                type="password"
+                className="filter-input"
+                style={{ width: '100%' }}
+                placeholder="sk-..."
+                value={aiSettings.deepseekKey}
+                onChange={e => setAiSettings(prev => ({ ...prev, deepseekKey: e.target.value }))}
+              />
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                Sua chave é salva localmente no navegador.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button className="btn" onClick={() => setIsSettingsOpen(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={() => {
+                localStorage.setItem('cs-ai-settings', JSON.stringify(aiSettings));
+                setIsSettingsOpen(false);
+                alert('Configurações salvas com sucesso!');
+              }}>Salvar Alterações</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

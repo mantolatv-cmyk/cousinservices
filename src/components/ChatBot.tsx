@@ -96,9 +96,17 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
     setIsLoading(true);
 
     try {
+      // Get AI settings from localStorage
+      const savedSettings = localStorage.getItem('cs-ai-settings');
+      const aiSettings = savedSettings ? JSON.parse(savedSettings) : null;
+      
       const res = await fetch('/api/bot', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-ai-provider': aiSettings?.provider || 'gemini',
+          'x-deepseek-key': aiSettings?.deepseekKey || '',
+        },
         body: JSON.stringify({ message: userInput }),
       });
       const data = await res.json();

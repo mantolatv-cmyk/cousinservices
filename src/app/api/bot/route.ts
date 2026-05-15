@@ -255,9 +255,59 @@ function processCommand(input: string): string {
   return `🤖 Comando não reconhecido. Digite \`/ajuda\` para ver a lista.`;
 }
 
-// ===================== GEMINI INTEGRATION =====================
+// ===================== AI INTEGRATIONS =====================
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+async function getDeepSeekResponse(userMessage: string, contextItems: AnaliseItem[], apiKey: string): Promise<string> {
+  const key = (apiKey && apiKey.trim().length > 0) ? apiKey : process.env.DEEPSEEK_API_KEY;
+  console.log('Bot API: DeepSeek Key Status:', key ? 'Key Found' : 'Key MISSING');
+  if (!key || key.length < 10) {
+    return "🤖 Modo offline DeepSeek (API Key não detectada). Verifique as configurações.";
+  }
+
+  try {
+    const top5 = contextItems
+      .sort((a, b) => (b.roiEstimado || 0) - (a.roiEstimado || 0))
+      .slice(0, 5)
+      .map((item, i) => `#${i+1}: ${item.bairro}/${item.cidade} - ROI ${item.roiEstimado.toFixed(1)}% - Lance ${fmt(item.lanceInicial)}`)
+      .join('\n');
+
+    const prompt = `
+      Você é o AgentBot, um assistente virtual especialista em leilões de terrenos para a plataforma CousinServices.
+      CONTEXTO ATUAL (Top 5 Oportunidades):
+      ${top5}
+      
+      TOTAL DE TERRENOS: ${contextItems.length}
+      
+      INSTRUÇÕES:
+      - Responda de forma profissional e curta. Em português.
+      - Se o usuário quiser filtrar algo, recomende o comando /buscar [cidade].
+      - Indique que está usando DeepSeek no final da resposta discretamente.
+      - Pergunta: "${userMessage}"
+    `;
+
+    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 500
+      })
+    });
+
+    const data = await res.json();
+    return (data.choices?.[0]?.message?.content || "Sem resposta do DeepSeek.") + "\n\n*✨ Powered by DeepSeek*";
+  } catch (err) {
+    console.error('DeepSeek Error:', err);
+    return "🤖 Erro ao conectar com DeepSeek. Tente comandos (/ajuda).";
+  }
+}
 
 async function getGeminiResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
   console.log('Bot API: Checking Key...', process.env.GOOGLE_AI_KEY ? 'Present' : 'MISSING');
@@ -299,13 +349,39 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const message = body.message || '';
     
+    console.log(`Bot API: Request received. Message: "${message.substring(0, 20)}..."`);
+    
     if (message.startsWith('/')) {
       return NextResponse.json({ response: processCommand(message) });
     }
 
     const itemsData = loadAnalysisData();
     const items = itemsData?.items || [];
-    const response = await getGeminiResponse(message, items);
+    
+    // Detection logic: Priority to header, then .env
+    const geminiKey = process.env.GOOGLE_AI_KEY || '';
+    const deepseekEnvKey = process.env.DEEPSEEK_API_KEY || '';
+    const clientDeepseekKey = req.headers.get('x-deepseek-key') || '';
+    
+    let provider = req.headers.get('x-ai-provider');
+    
+    // Auto-switch if default gemini is missing but deepseek is available
+    if (!provider || provider === 'gemini') {
+      if ((!geminiKey || geminiKey.length < 10) && (deepseekEnvKey || clientDeepseekKey)) {
+        provider = 'deepseek';
+      } else {
+        provider = 'gemini';
+      }
+    }
+    
+    console.log(`Bot API: Selected Provider: ${provider}`);
+    
+    let response = '';
+    if (provider === 'deepseek') {
+      response = await getDeepSeekResponse(message, items, clientDeepseekKey);
+    } else {
+      response = await getGeminiResponse(message, items);
+    }
     
     return NextResponse.json({ response });
   } catch (err) {
