@@ -255,93 +255,102 @@ function processCommand(input: string): string {
   return `🤖 Comando não reconhecido. Digite \`/ajuda\` para ver a lista.`;
 }
 
-// ===================== AI INTEGRATIONS =====================
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+// ===================== AI PROVIDER SYSTEM =====================
+// DeepSeek (primário) → Gemini (fallback)
+// DeepSeek usa API compatível com OpenAI (https://api.deepseek.com)
+// ===============================================================
 
-async function getDeepSeekResponse(userMessage: string, contextItems: AnaliseItem[], apiKey: string): Promise<string> {
-  const key = (apiKey && apiKey.trim().length > 0) ? apiKey : process.env.DEEPSEEK_API_KEY;
-  console.log('Bot API: DeepSeek Key Status:', key ? 'Key Found' : 'Key MISSING');
-  if (!key || key.length < 10) {
-    return "🤖 Modo offline DeepSeek (API Key não detectada). Verifique as configurações.";
-  }
+const SYSTEM_PROMPT = `Você é o AgentBot, um assistente virtual especialista em leilões de terrenos para a plataforma CousinServices.
+INSTRUÇÕES:
+- Responda de forma profissional e curta (máximo 3 parágrafos).
+- Fale sempre em português brasileiro.
+- Se o usuário quiser filtrar algo, recomende o comando /buscar [cidade].
+- Use dados do contexto fornecido para embasar suas respostas.
+- Quando citar valores, use formato brasileiro (R$ X.XXX).`;
 
-  try {
-    const top5 = contextItems
-      .sort((a, b) => (b.roiEstimado || 0) - (a.roiEstimado || 0))
-      .slice(0, 5)
-      .map((item, i) => `#${i+1}: ${item.bairro}/${item.cidade} - ROI ${item.roiEstimado.toFixed(1)}% - Lance ${fmt(item.lanceInicial)}`)
-      .join('\n');
+function buildContextPrompt(userMessage: string, contextItems: AnaliseItem[]): string {
+  const top5 = contextItems
+    .sort((a, b) => (b.roiEstimado || 0) - (a.roiEstimado || 0))
+    .slice(0, 5)
+    .map((item, i) => `#${i+1}: ${item.bairro}/${item.cidade} - ROI ${item.roiEstimado.toFixed(1)}% - Lance ${fmt(item.lanceInicial)} - Mercado ${fmt(item.valorMercadoEstimado)} - ${item.status} ${item.tipoLeilao}`)
+    .join('\n');
 
-    const prompt = `
-      Você é o AgentBot, um assistente virtual especialista em leilões de terrenos para a plataforma CousinServices.
-      CONTEXTO ATUAL (Top 5 Oportunidades):
-      ${top5}
-      
-      TOTAL DE TERRENOS: ${contextItems.length}
-      
-      INSTRUÇÕES:
-      - Responda de forma profissional e curta. Em português.
-      - Se o usuário quiser filtrar algo, recomende o comando /buscar [cidade].
-      - Indique que está usando DeepSeek no final da resposta discretamente.
-      - Pergunta: "${userMessage}"
-    `;
-
-    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 500
-      })
-    });
-
-    const data = await res.json();
-    return (data.choices?.[0]?.message?.content || "Sem resposta do DeepSeek.") + "\n\n*✨ Powered by DeepSeek*";
-  } catch (err) {
-    console.error('DeepSeek Error:', err);
-    return "🤖 Erro ao conectar com DeepSeek. Tente comandos (/ajuda).";
-  }
+  return `CONTEXTO ATUAL (Top 5 Oportunidades):\n${top5}\n\nTOTAL DE TERRENOS: ${contextItems.length}\n\nPergunta do usuário: "${userMessage}"`;
 }
 
+// --- DeepSeek Provider (API compatível com OpenAI) ---
+async function getDeepSeekResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey || apiKey.length < 10) {
+    throw new Error('DEEPSEEK_API_KEY não configurada');
+  }
+
+  const contextPrompt = buildContextPrompt(userMessage, contextItems);
+
+  const response = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: contextPrompt },
+      ],
+      max_tokens: 1024,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DeepSeek API error (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error('DeepSeek retornou resposta vazia');
+
+  return text;
+}
+
+// --- Gemini Provider ---
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY || '');
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 async function getGeminiResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
-  console.log('Bot API: Checking Key...', process.env.GOOGLE_AI_KEY ? 'Present' : 'MISSING');
-  
   if (!process.env.GOOGLE_AI_KEY || process.env.GOOGLE_AI_KEY.length < 10) {
-    return "🤖 Modo offline (API Key não detectada). Use comandos como `/buscar` ou `/ajuda`.";
+    throw new Error('GOOGLE_AI_KEY não configurada');
   }
 
-  try {
-    const top5 = contextItems
-      .sort((a, b) => (b.roiEstimado || 0) - (a.roiEstimado || 0))
-      .slice(0, 5)
-      .map((item, i) => `#${i+1}: ${item.bairro}/${item.cidade} - ROI ${item.roiEstimado.toFixed(1)}% - Lance ${fmt(item.lanceInicial)}`)
-      .join('\n');
+  const contextPrompt = buildContextPrompt(userMessage, contextItems);
+  const fullPrompt = `${SYSTEM_PROMPT}\n\n${contextPrompt}`;
 
-    const prompt = `
-      Você é o AgentBot, um assistente virtual especialista em leilões de terrenos para a plataforma CousinServices.
-      CONTEXTO ATUAL (Top 5 Oportunidades):
-      ${top5}
-      
-      TOTAL DE TERRENOS: ${contextItems.length}
-      
-      INSTRUÇÕES:
-      - Responda de forma profissional e curta.
-      - Se o usuário quiser filtrar algo, recomende o comando /buscar [cidade].
-      - Pergunta: "${userMessage}"
-    `;
+  const result = await geminiModel.generateContent(fullPrompt);
+  return result.response.text();
+}
 
-    const result = await model.generateContent(prompt);
-    return result.response.text();
-  } catch (err) {
-    console.error('Gemini Error:', err);
-    return "🤖 Desculpe, tive um problema técnico. Tente usar comandos (/ajuda).";
+// --- Orquestrador com Fallback ---
+async function getAIResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
+  const providers: Array<{ name: string; fn: () => Promise<string> }> = [
+    { name: 'DeepSeek', fn: () => getDeepSeekResponse(userMessage, contextItems) },
+    { name: 'Gemini', fn: () => getGeminiResponse(userMessage, contextItems) },
+  ];
+
+  for (const provider of providers) {
+    try {
+      console.log(`🤖 Bot API: Tentando ${provider.name}...`);
+      const response = await provider.fn();
+      console.log(`✅ Bot API: Resposta obtida via ${provider.name}`);
+      return `${response}\n\n_— via ${provider.name}_`;
+    } catch (err) {
+      console.warn(`⚠️ Bot API: ${provider.name} falhou: ${(err as Error).message}`);
+    }
   }
+
+  return "🤖 Modo offline (nenhum provider de IA disponível). Use comandos como `/buscar` ou `/ajuda`.";
 }
 
 export async function POST(req: NextRequest) {
@@ -349,42 +358,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const message = body.message || '';
     
-    console.log(`Bot API: Request received. Message: "${message.substring(0, 20)}..."`);
-    
     if (message.startsWith('/')) {
       return NextResponse.json({ response: processCommand(message) });
     }
 
     const itemsData = loadAnalysisData();
     const items = itemsData?.items || [];
-    
-    // Detection logic: Priority to header, then .env
-    const geminiKey = process.env.GOOGLE_AI_KEY || '';
-    const deepseekEnvKey = process.env.DEEPSEEK_API_KEY || '';
-    const clientDeepseekKey = req.headers.get('x-deepseek-key') || '';
-    
-    let provider = req.headers.get('x-ai-provider');
-    
-    // Auto-switch if default gemini is missing but deepseek is available
-    if (!provider || provider === 'gemini') {
-      if ((!geminiKey || geminiKey.length < 10) && (deepseekEnvKey || clientDeepseekKey)) {
-        provider = 'deepseek';
-      } else {
-        provider = 'gemini';
-      }
-    }
-    
-    console.log(`Bot API: Selected Provider: ${provider}`);
-    
-    let response = '';
-    if (provider === 'deepseek') {
-      response = await getDeepSeekResponse(message, items, clientDeepseekKey);
-    } else {
-      response = await getGeminiResponse(message, items);
-    }
+    const response = await getAIResponse(message, items);
     
     return NextResponse.json({ response });
   } catch (err) {
     return NextResponse.json({ response: `❌ Erro: ${(err as Error).message}` }, { status: 500 });
   }
 }
+
