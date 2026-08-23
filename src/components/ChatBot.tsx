@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-
+import { Bot, X, XCircle } from 'lucide-react';
 interface ChatMessage {
   id: string;
   role: 'user' | 'bot';
@@ -20,7 +20,7 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
     {
       id: 'welcome',
       role: 'bot',
-      content: '🤖 Olá! Sou o **AgentBot CousinServices**.\n\nAgora estou mais inteligente! Posso comparar lotes, detectar leilões urgentes e gerar relatórios PDF.\n\nComandos principais:\n▸ `/buscar [cidade]` — Filtra o dashboard\n▸ `/comparar #1 #2` — Análise lado a lado\n▸ `/urgente` — Leilões nos próximos 3 dias\n▸ `/exportar` — Gera PDF executivo\n\nDigite `/ajuda` para ver todos os comandos.',
+      content: 'Olá! Sou o **AgentBot CousinServices**.\n\nAgora estou mais inteligente! Posso comparar lotes, detectar leilões urgentes e gerar relatórios PDF.\n\nComandos principais:\n▸ `/buscar [cidade]` — Filtra o dashboard\n▸ `/comparar #1 #2` — Análise lado a lado\n▸ `/urgente` — Leilões nos próximos 3 dias\n▸ `/exportar` — Gera PDF executivo\n\nDigite `/ajuda` para ver todos os comandos.',
       timestamp: new Date(),
     },
   ]);
@@ -114,7 +114,7 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
       setMessages(prev => [...prev, {
         id: `bot-${Date.now()}`,
         role: 'bot',
-        content: data.response || '❌ Sem resposta.',
+        content: data.response || 'Sem resposta.',
         timestamp: new Date(),
       }]);
 
@@ -167,7 +167,7 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
       setMessages(prev => [...prev, {
         id: `err-${Date.now()}`,
         role: 'bot',
-        content: '❌ Erro ao processar. Tente novamente.',
+        content: 'Erro ao processar. Tente novamente.',
         timestamp: new Date(),
       }]);
     } finally {
@@ -221,7 +221,7 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
           transform: isOpen ? 'rotate(45deg) scale(0.9)' : pulseCount > 0 ? 'scale(1.1)' : 'scale(1)',
         }}
       >
-        {isOpen ? '✕' : '🤖'}
+        {isOpen ? <X size={24} /> : <Bot size={24} />}
       </button>
 
       {/* Chat panel */}
@@ -257,7 +257,7 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
                 background: 'linear-gradient(135deg, #10B981, #059669)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: '18px',
-              }}>🤖</span>
+              }}><Bot size={20} /></span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#F1F5F9' }}>AgentBot CousinServices</div>
                 <div style={{ fontSize: '11px', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>

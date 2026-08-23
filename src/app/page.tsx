@@ -6,6 +6,7 @@ import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, C
 import { getAllZonas } from '@/data/spRegions';
 import { formatCurrency, formatCurrencyCompact, formatPercent, formatArea, formatDate, formatDateTime, daysUntil, getAttentionPoints } from '@/lib/format';
 import ChatBot from '@/components/ChatBot';
+import { Settings, Sun, Moon, CheckCircle2, AlertTriangle, XCircle, SkipForward, Bot, BarChart2, Trophy, DollarSign, Target, TrendingUp, Map as MapIcon, Globe, UploadCloud, Timer, RefreshCw, Maximize, Star, Search } from 'lucide-react';
 import type { AuctionLot, FilterState, ScrapingStatus as ScrapingStatusType } from '@/lib/types';
 
 
@@ -295,10 +296,10 @@ export default function Home() {
             {isRefreshing ? '⟳ Scraping em andamento…' : '⟳ Atualizar Dados'}
           </button>
           <button className="btn btn-sm" onClick={() => setIsSettingsOpen(true)} title="Configurações AI">
-            ⚙️
+            <Settings size={20} />
           </button>
           <button className="btn btn-sm" onClick={() => setIsDark(!isDark)} title="Alternar tema" style={{ fontSize: '16px', padding: '8px 12px' }}>
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
       </header>
@@ -318,9 +319,9 @@ export default function Home() {
               {isRefreshing ? (
                 <><span style={{ animation: 'pulse 1.5s infinite' }}>🔄</span> Pipeline de Atualização em Andamento...</>
               ) : refreshResult?.success ? (
-                <><span>✅</span> Atualização Concluída!</>
+                <><CheckCircle2 size={16} className="inline-block mr-1 text-green-500"/> Atualização Concluída!</>
               ) : (
-                <><span>⚠️</span> Atualização com Problemas</>
+                <><AlertTriangle size={16} className="inline-block mr-1 text-yellow-500"/> Atualização com Problemas</>
               )}
             </div>
             {!isRefreshing && (
@@ -333,14 +334,18 @@ export default function Home() {
 
           {isRefreshing && !refreshResult && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {['🌐 Scraping de 16 leiloeiros renomados...', '💰 Análise financeira pendente', '📤 Sincronização pendente'].map((label, i) => (
+              {[
+                <React.Fragment key="l1"><Globe size={14} className="inline-block mr-1" /> Scraping de 16 leiloeiros renomados...</React.Fragment>,
+                <React.Fragment key="l2"><DollarSign size={14} className="inline-block mr-1" /> Análise financeira pendente</React.Fragment>,
+                <React.Fragment key="l3"><UploadCloud size={14} className="inline-block mr-1" /> Sincronização pendente</React.Fragment>
+              ].map((label, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: i === 0 ? '#00E0FF' : 'var(--text-muted)' }}>
                   <span style={{ width: '20px', textAlign: 'center' }}>{i === 0 ? <span style={{ animation: 'pulse 1s infinite' }}>⟳</span> : '○'}</span>
                   <span>{label}</span>
                 </div>
               ))}
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px', fontStyle: 'italic' }}>
-                ⏱️ O scraping pode levar de 2 a 5 minutos dependendo da velocidade dos sites...
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px', fontStyle: 'italic' }}>
+                <Timer size={12} className="text-blue-500"/> O scraping pode levar de 2 a 5 minutos dependendo da velocidade dos sites...
               </div>
             </div>
           )}
@@ -349,8 +354,8 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {refreshResult.phases.map((phase, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px' }}>
-                  <span style={{ width: '20px', textAlign: 'center' }}>
-                    {phase.status === 'success' ? '✅' : phase.status === 'error' ? '❌' : '⏭️'}
+                  <span style={{ width: '20px', textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
+                    {phase.status === 'success' ? <CheckCircle2 size={16} className="text-green-500"/> : phase.status === 'error' ? <XCircle size={16} className="text-red-500"/> : <SkipForward size={16} className="text-gray-500"/>}
                   </span>
                   <span style={{ flex: 1, fontWeight: 600 }}>{phase.name}</span>
                   <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -388,7 +393,7 @@ export default function Home() {
           color: '#00FFA3',
           animation: 'fadeIn 0.3s ease',
         }}>
-          <span>🤖 Filtrado pelo AgentBot: <strong>&quot;{botFilter}&quot;</strong> — {filteredLots.length} resultado{filteredLots.length !== 1 ? 's' : ''}</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Bot size={16} className="text-blue-500"/> Filtrado pelo AgentBot: <strong>&quot;{botFilter}&quot;</strong> — {filteredLots.length} resultado{filteredLots.length !== 1 ? 's' : ''}</span>
           <button
             onClick={() => setBotFilter(null)}
             style={{
@@ -409,40 +414,40 @@ export default function Home() {
       {/* === LOADING STATE === */}
       {isLoading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-          <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}>⟳</div>
+          <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'pulse 1.5s infinite' }}><RefreshCw size={32} /></div>
           <div>Carregando dados reais dos leilões...</div>
         </div>
       ) : (
         <>
           {/* === METRICS BAR === */}
           <div className="metrics-bar">
-            <div className="metric-card animate-in">
-              <div className="metric-label">📊 Oportunidades</div>
+            <div className="metric-card">
+              <div className="metric-label"><BarChart2 size={16} className="inline-block mr-1"/> Oportunidades</div>
               <div className="metric-value">{metrics.totalOportunidades}</div>
               <div className="metric-change">terrenos com ROI &gt; {filters.roiMinimo || 20}%</div>
             </div>
-            <div className="metric-card animate-in">
-              <div className="metric-label">🏆 Melhor ROI</div>
+            <div className="metric-card">
+              <div className="metric-label"><Trophy size={16} className="inline-block mr-1"/> Melhor ROI</div>
               <div className="metric-value positive">{formatPercent(metrics.melhorROI)}</div>
               <div className="metric-change">retorno sobre investimento</div>
             </div>
-            <div className="metric-card animate-in">
-              <div className="metric-label">💰 Deságio Médio</div>
+            <div className="metric-card">
+              <div className="metric-label"><DollarSign size={16} className="inline-block mr-1"/> Deságio Médio</div>
               <div className="metric-value warning">{formatPercent(metrics.desagioMedio)}</div>
               <div className="metric-change">desconto vs. mercado</div>
             </div>
-            <div className="metric-card animate-in">
-              <div className="metric-label">🎯 Investimento Mín.</div>
+            <div className="metric-card">
+              <div className="metric-label"><Target size={16} className="inline-block mr-1"/> Investimento Mín.</div>
               <div className="metric-value">{formatCurrencyCompact(metrics.investimentoMinimo)}</div>
               <div className="metric-change">menor entrada necessária</div>
             </div>
-            <div className="metric-card animate-in">
-              <div className="metric-label">📈 Lucro Potencial Total</div>
+            <div className="metric-card">
+              <div className="metric-label"><TrendingUp size={16} className="inline-block mr-1"/> Lucro Potencial Total</div>
               <div className="metric-value positive">{formatCurrencyCompact(metrics.lucroPotencialTotal)}</div>
               <div className="metric-change">soma de todas as oportunidades</div>
             </div>
-            <div className="metric-card animate-in">
-              <div className="metric-label">📐 Preço Médio/m²</div>
+            <div className="metric-card">
+              <div className="metric-label"><Maximize size={16} className="inline-block mr-1"/> Preço Médio/m²</div>
               <div className="metric-value">{formatCurrency(metrics.mediaPrecoM2)}</div>
               <div className="metric-change">nos leilões filtrados</div>
             </div>
@@ -510,7 +515,7 @@ export default function Home() {
           {/* === PRICE COMPARISON CHART === */}
           {chartData.length > 0 && (
             <div className="chart-section animate-in">
-              <div className="chart-title">📊 Preço m²: Oportunidade vs. Valor de Mercado</div>
+              <div className="chart-title"><BarChart2 size={16} className="inline-block mr-1"/> Preço m²: Oportunidade vs. Valor de Mercado</div>
               
               <svg width="0" height="0">
                 <defs>
@@ -611,7 +616,7 @@ export default function Home() {
               marginBottom: '32px',
             }}>
               <div className="chart-section animate-in" style={{ marginBottom: 0 }}>
-                <div className="chart-title" style={{ fontSize: '16px' }}>🗺️ Distribuição por Região</div>
+                <div className="chart-title" style={{ fontSize: '16px' }}><MapIcon size={16} className="inline-block mr-1"/> Distribuição por Região</div>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
@@ -643,7 +648,7 @@ export default function Home() {
                 </ResponsiveContainer>
               </div>
               <div className="chart-section animate-in" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div className="chart-title" style={{ fontSize: '16px' }}>📊 Resumo por Zona</div>
+                <div className="chart-title" style={{ fontSize: '16px' }}><BarChart2 size={16} className="inline-block mr-1"/> Resumo por Zona</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {regionData.map((r, i) => (
                     <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -665,7 +670,7 @@ export default function Home() {
           {favorites.size > 0 && (
             <div className="cards-section">
               <div className="cards-header">
-                <div className="cards-title">⭐ Meus Favoritos <span className="cards-count">— {favorites.size} salvo{favorites.size !== 1 ? 's' : ''}</span></div>
+                <div className="cards-title"><Star size={20} className="inline-block mr-2 text-yellow-500" /> Meus Favoritos <span className="cards-count">— {favorites.size} salvo{favorites.size !== 1 ? 's' : ''}</span></div>
               </div>
               <div className="cards-grid">
                 {filteredLots.filter(l => favorites.has(l.id)).map((lot, idx) => (
@@ -678,16 +683,16 @@ export default function Home() {
           {/* === OPPORTUNITIES === */}
           <div className="cards-section">
             <div className="cards-header">
-              <div className="cards-title">
-                🏆 Top Oportunidades Ranqueadas
-                <span className="cards-count">— {filteredLots.length} terreno{filteredLots.length !== 1 ? 's' : ''} encontrado{filteredLots.length !== 1 ? 's' : ''}</span>
-                {botFilter && <span style={{ color: '#10B981', fontSize: '12px', marginLeft: '8px' }}>🤖 filtrado</span>}
-              </div>
+              <h2 className="section-title">
+                <Trophy size={20} className="inline-block mr-2 text-yellow-500"/> Top Oportunidades Ranqueadas
+                <span className="badge">{filteredLots.length}</span>
+                {botFilter && <span style={{ color: '#10B981', fontSize: '12px', marginLeft: '8px' }}><Bot size={12} className="inline-block mr-1"/> filtrado</span>}
+              </h2>
             </div>
 
             {filteredLots.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-icon">🔍</div>
+                <div className="empty-state-icon"><Search size={48} /></div>
                 <div className="empty-state-title">Nenhuma oportunidade encontrada</div>
                 <div className="empty-state-text">
                   {botFilter
@@ -790,7 +795,7 @@ export default function Home() {
             padding: '32px', boxShadow: 'var(--shadow-lg)'
           }}>
             <h2 style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              ⚙️ Configurações AI
+              <Settings size={18} className="inline-block mr-1"/> Configurações AI
             </h2>
             
             <div style={{ marginBottom: '24px' }}>
@@ -955,7 +960,7 @@ function OpportunityCard({ lot, rank, expanded, onToggle, isFavorite, onToggleFa
           )}
 
           <div className="card-attention">
-            <span className="card-attention-icon">⚠️</span>
+            <AlertTriangle size={16} className="card-attention-icon text-yellow-500" />
             <span>{getAttentionPoints(lot)}</span>
           </div>
 

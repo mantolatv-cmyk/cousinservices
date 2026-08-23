@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { DollarSign, BarChart2, TrendingDown, Maximize2 } from 'lucide-react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { AuctionLot } from '@/lib/types';
@@ -107,10 +108,10 @@ export default function HeatMap({ lots }: HeatMapProps) {
                 <br />
                 <span style={{ color: '#64748B' }}>{lot.cidade}/{lot.estado}</span>
                 <hr style={{ margin: '6px 0', border: 'none', borderTop: '1px solid #E2E8F0' }} />
-                <div>📐 Área: <strong>{lot.areaM2?.toLocaleString('pt-BR')}m²</strong></div>
-                <div>💰 Lance: <strong>{formatCurrency(lot.lanceInicial)}</strong></div>
-                <div>📊 ROI: <strong style={{ color }}>{formatPercent(roi)}</strong></div>
-                <div>📉 Deságio: <strong>{formatPercent(lot.analysis?.desagio || 0)}</strong></div>
+                <div><Maximize2 size={12} className="inline-block mr-1 text-gray-500" /> Área: <strong>{lot.areaM2?.toLocaleString('pt-BR')}m²</strong></div>
+                <div><DollarSign size={12} className="inline-block mr-1 text-gray-500" /> Lance: <strong>{formatCurrency(lot.lanceInicial)}</strong></div>
+                <div><BarChart2 size={12} className="inline-block mr-1 text-gray-500" /> ROI: <strong style={{ color }}>{formatPercent(roi)}</strong></div>
+                <div><TrendingDown size={12} className="inline-block mr-1 text-gray-500" /> Deságio: <strong>{formatPercent(lot.analysis?.desagio || 0)}</strong></div>
               </div>
             </Popup>
           </CircleMarker>
