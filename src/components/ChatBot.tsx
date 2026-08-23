@@ -20,7 +20,7 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
     {
       id: 'welcome',
       role: 'bot',
-      content: 'Olá! Sou o **AgentBot CousinServices**.\n\nAgora estou mais inteligente! Posso comparar lotes, detectar leilões urgentes e gerar relatórios PDF.\n\nComandos principais:\n▸ `/buscar [cidade]` — Filtra o dashboard\n▸ `/comparar #1 #2` — Análise lado a lado\n▸ `/urgente` — Leilões nos próximos 3 dias\n▸ `/exportar` — Gera PDF executivo\n\nDigite `/ajuda` para ver todos os comandos.',
+      content: 'Olá! Sou o **AgentBot CousinServices**, seu assistente de inteligência artificial.\n\nPosso te ajudar a encontrar oportunidades, comparar lotes e fazer análises financeiras instantâneas.\n\nExperimente me perguntar:\n▸ "Quais os 3 terrenos com maior lucro?"\n▸ "Tem alguma oportunidade urgente?"\n▸ "Filtre terrenos em Campinas por menos de 500 mil"\n▸ "Compare as opções de Santo André e São Bernardo"',
       timestamp: new Date(),
     },
   ]);
@@ -183,13 +183,11 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
   };
 
   const quickCommands = [
-    '/top 5', 
-    '/urgente', 
-    '/comparar #1 #2', 
-    '/resumo', 
-    '/exportar', 
-    '/historico',
-    '/buscar São Paulo'
+    'Quais as 3 melhores oportunidades?',
+    'Tem algum leilão urgente?',
+    'Filtre terrenos em São Paulo',
+    'Faça um resumo dos 2 melhores',
+    'Compare o terreno #1 e o #2'
   ];
 
   return (
@@ -362,7 +360,6 @@ export default function ChatBot({ onBotFilter, activeBotFilter }: ChatBotProps) 
                   color: '#94A3B8',
                   fontSize: '11px',
                   cursor: 'pointer',
-                  fontFamily: "'JetBrains Mono', monospace",
                   transition: 'all 0.2s',
                 }}
                 onMouseEnter={e => { (e.target as HTMLElement).style.borderColor = '#10B981'; (e.target as HTMLElement).style.color = '#10B981'; }}
