@@ -60,7 +60,8 @@ async function runLocalPipeline(): Promise<PipelineResult> {
       name: 'Scraping de Leiloeiros',
       status: 'success',
       durationMs: phase1Duration,
-      details: `${totalItems} terrenos coletados de 11 fontes`,
+      details: `${totalItems} terrenos coletados de 16 fontes`,
+
     });
 
     if (stderr && !stderr.includes('Warning')) {

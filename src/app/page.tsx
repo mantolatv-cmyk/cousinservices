@@ -332,7 +332,7 @@ export default function Home() {
 
           {isRefreshing && !refreshResult && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {['🌐 Scraping de 11 leiloeiros...', '💰 Análise financeira pendente', '📤 Sincronização pendente'].map((label, i) => (
+              {['🌐 Scraping de 16 leiloeiros renomados...', '💰 Análise financeira pendente', '📤 Sincronização pendente'].map((label, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: i === 0 ? '#00E0FF' : 'var(--text-muted)' }}>
                   <span style={{ width: '20px', textAlign: 'center' }}>{i === 0 ? <span style={{ animation: 'pulse 1s infinite' }}>⟳</span> : '○'}</span>
                   <span>{label}</span>

@@ -840,8 +840,353 @@ async function scrapeLeilaoImovel(page: Page): Promise<LeilaoItem[]> {
   return items;
 }
 
+// ===================== PESTANA LEILÕES =====================
+async function scrapePestanaLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Pestana Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.pestanaleiloes.com.br/leiloes/imoveis?categoria=terrenos&uf=SP', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card-leilao, .lote-item, [class*="card"], [class*="imovel"]');
+
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote|gleba|área/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('h2, h3, h4, .title, .titulo')?.textContent?.trim() || 'Terreno Pestana',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400),
+        });
+      });
+      return results;
+    });
+
+    console.log(`  [Pestana Leilões] ${rawItems.length} cards encontrados`);
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `pestana-pw-${i}-${Date.now()}`,
+        fonte: 'Pestana Leilões',
+        url: r.link || 'https://www.pestanaleiloes.com.br',
+        endereco: r.title,
+        bairro: r.title.split('-')[0]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 300,
+        lanceInicial: lance,
+        valorAvaliacao: parseCurrency(r.prices[1] || '') || lance * 1.5,
+        status: r.fullText.match(/2[ªa]\s*praça/i) ? '2ª Praça' : '1ª Praça',
+        tipoLeilao: r.fullText.match(/judicial/i) ? 'Judicial' : 'Extrajudicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Pestana Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Pestana Leilões] Erro: ${(err as Error).message}`);
+  }
+
+  console.log(`  [Pestana Leilões] ✅ ${items.length} terrenos extraídos`);
+  return items;
+}
+
+// ===================== LUT LEILÕES =====================
+async function scrapeLutLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Lut Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.lut.com.br/busca?categoria=2&uf=SP', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card, .box-lote, [class*="lote"], [class*="card"]');
+
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote|gleba|área/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('h3, h4, .title, .nome')?.textContent?.trim() || 'Terreno Lut',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400),
+        });
+      });
+      return results;
+    });
+
+    console.log(`  [Lut Leilões] ${rawItems.length} cards encontrados`);
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `lut-pw-${i}-${Date.now()}`,
+        fonte: 'Lut Leilões',
+        url: r.link || 'https://www.lut.com.br',
+        endereco: r.title,
+        bairro: r.title.split('-')[0]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 280,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.6,
+        status: 'Judicial',
+        tipoLeilao: 'Judicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Lut Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Lut Leilões] Erro: ${(err as Error).message}`);
+  }
+
+  console.log(`  [Lut Leilões] ✅ ${items.length} terrenos extraídos`);
+  return items;
+}
+
+// ===================== VIVA LEILÕES =====================
+async function scrapeVivaLeiloes(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Viva Leilões] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.vivaleiloes.com.br/busca/?q=terreno&uf=SP', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card-leilao, .lote, .card, [class*="item"]');
+
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote|gleba/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('h2, h3, h4, .titulo')?.textContent?.trim() || 'Terreno Viva',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400),
+        });
+      });
+      return results;
+    });
+
+    console.log(`  [Viva Leilões] ${rawItems.length} cards encontrados`);
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `viva-pw-${i}-${Date.now()}`,
+        fonte: 'Viva Leilões',
+        url: r.link || 'https://www.vivaleiloes.com.br',
+        endereco: r.title,
+        bairro: r.title.split('-')[0]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: parseCurrency(r.prices[1] || '') || lance * 1.5,
+        status: 'Aberto',
+        tipoLeilao: 'Judicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Viva Leilões',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Viva Leilões] Erro: ${(err as Error).message}`);
+  }
+
+  console.log(`  [Viva Leilões] ✅ ${items.length} terrenos extraídos`);
+  return items;
+}
+
+// ===================== LANCE JUDICIAL =====================
+async function scrapeLanceJudicial(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Lance Judicial] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.lancejudicial.com.br/leiloes/imoveis/terrenos/sp', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('.card, .card-item, [class*="lote"]');
+
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote|área/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('.titulo, h3, h4')?.textContent?.trim() || 'Terreno Lance Judicial',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400),
+        });
+      });
+      return results;
+    });
+
+    console.log(`  [Lance Judicial] ${rawItems.length} cards encontrados`);
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `lancejud-pw-${i}-${Date.now()}`,
+        fonte: 'Lance Judicial',
+        url: r.link || 'https://www.lancejudicial.com.br',
+        endereco: r.title,
+        bairro: r.title.split('-')[0]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 300,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.6,
+        status: 'Judicial',
+        tipoLeilao: 'Judicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Lance Judicial',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Lance Judicial] Erro: ${(err as Error).message}`);
+  }
+
+  console.log(`  [Lance Judicial] ✅ ${items.length} terrenos extraídos`);
+  return items;
+}
+
+// ===================== SUPERBID =====================
+async function scrapeSuperbid(page: Page): Promise<LeilaoItem[]> {
+  const items: LeilaoItem[] = [];
+  console.log('\n🔍 [Superbid] Iniciando scraping...');
+
+  try {
+    await page.goto('https://www.superbid.net/busca/imoveis/terreno?uf=SP', {
+      waitUntil: 'networkidle',
+      timeout: 45000,
+    });
+    await page.waitForTimeout(4000);
+
+    const rawItems = await page.evaluate(() => {
+      const results: Array<{ title: string; prices: string[]; link: string; fullText: string }> = [];
+      const cards = document.querySelectorAll('[class*="Card"], [class*="offer-card"], article, .card');
+
+      cards.forEach(card => {
+        const el = card as HTMLElement;
+        const text = el.innerText || '';
+        if (!text.match(/terreno|lote|gleba/i)) return;
+
+        const linkEl = el.querySelector('a') as HTMLAnchorElement;
+        const prices = text.match(/R\$\s*[\d.,]+/g) || [];
+
+        results.push({
+          title: el.querySelector('h2, h3, [class*="title"]')?.textContent?.trim() || 'Terreno Superbid',
+          prices: prices.map(p => p.trim()),
+          link: linkEl?.href || '',
+          fullText: text.substring(0, 400),
+        });
+      });
+      return results;
+    });
+
+    console.log(`  [Superbid] ${rawItems.length} cards encontrados`);
+
+    for (let i = 0; i < rawItems.length; i++) {
+      const r = rawItems[i];
+      const lance = parseCurrency(r.prices[0] || '');
+      if (lance <= 0) continue;
+
+      items.push({
+        id: `superbid-pw-${i}-${Date.now()}`,
+        fonte: 'Superbid',
+        url: r.link || 'https://www.superbid.net',
+        endereco: r.title,
+        bairro: r.title.split('-')[0]?.trim() || 'São Paulo',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: extractCEP(r.fullText),
+        areaM2: parseArea(r.fullText) || 250,
+        lanceInicial: lance,
+        valorAvaliacao: lance * 1.5,
+        status: 'Aberto',
+        tipoLeilao: 'Extrajudicial',
+        dataLeilao: extractDate(r.fullText),
+        leiloeiro: 'Superbid Exchange',
+        descricao: r.fullText.substring(0, 200),
+        scrapedAt: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.error(`  [Superbid] Erro: ${(err as Error).message}`);
+  }
+
+  console.log(`  [Superbid] ✅ ${items.length} terrenos extraídos`);
+  return items;
+}
+
 function extractDate(text: string): string {
-  const match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  const match = text.match(/(\d{2})[\/\.-](\d{2})[\/\.-](\d{4})/);
   if (match) return `${match[3]}-${match[2]}-${match[1]}T14:00:00`;
   return new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString();
 }
@@ -849,8 +1194,8 @@ function extractDate(text: string): string {
 // ===================== MAIN =====================
 async function main() {
   console.log('╔══════════════════════════════════════════════════════════╗');
-  console.log('║   CousinServices — Multi-Source Scraper v2.0           ║');
-  console.log('║   Zuk + Mega + Sodré + Freitas → leiloes.json          ║');
+  console.log('║   CousinServices — Multi-Source Scraper v3.0           ║');
+  console.log('║   16 Fontes de Leilões Renomados em SP                 ║');
   console.log('╚══════════════════════════════════════════════════════════╝');
   console.log(`\n📅 ${new Date().toLocaleString('pt-BR')}\n`);
 
@@ -862,9 +1207,9 @@ async function main() {
 
   const allItems: LeilaoItem[] = [];
 
-  // Scrapers Execution - reordered to put Caixa last as it's the most unstable
+  // Scrapers Execution - 16 Fontes Oficiais e Renomadas
   const sources = [
-    { name: 'Zukerman', fn: scrapeZukerman },
+    { name: 'Zukerman (Portal Zuk)', fn: scrapeZukerman },
     { name: 'Mega Leilões', fn: scrapeMegaLeiloes },
     { name: 'Sodré Santoro', fn: scrapeSodreSantoro },
     { name: 'Freitas Leiloeiro', fn: scrapeFreitasLeiloeiro },
@@ -874,6 +1219,11 @@ async function main() {
     { name: 'Frazão Leilões', fn: scrapeFrazaoLeiloes },
     { name: 'Grupo Lance', fn: scrapeGrupoLance },
     { name: 'LEJE', fn: scrapeLeje },
+    { name: 'Pestana Leilões', fn: scrapePestanaLeiloes },
+    { name: 'Lut Leilões', fn: scrapeLutLeiloes },
+    { name: 'Viva Leilões', fn: scrapeVivaLeiloes },
+    { name: 'Lance Judicial', fn: scrapeLanceJudicial },
+    { name: 'Superbid', fn: scrapeSuperbid },
     { name: 'Leilão Imóvel (Agregador)', fn: scrapeLeilaoImovel }
   ];
 
@@ -899,25 +1249,20 @@ async function main() {
   }, null, 2), 'utf-8');
 
   console.log(`\n${'═'.repeat(58)}`);
-  console.log(`📊 RESULTADO CONSOLIDADO`);
+  console.log(`📊 RESULTADO CONSOLIDADO (${sources.length} FONTES)`);
   console.log(`${'═'.repeat(58)}`);
-  console.log(`  Zukerman:          ${allItems.filter(i => i.fonte.includes('Zuk')).length} terrenos`);
-  console.log(`  Mega Leilões:      ${allItems.filter(i => i.fonte.includes('Mega')).length} terrenos`);
-  console.log(`  Sodré Santoro:     ${allItems.filter(i => i.fonte.includes('Sodré')).length} terrenos`);
-  console.log(`  Freitas Leiloeiro: ${allItems.filter(i => i.fonte.includes('Freitas')).length} terrenos`);
-  console.log(`  Biasi Leilões:     ${allItems.filter(i => i.fonte.includes('Biasi')).length} terrenos`);
-  console.log(`  Milan Leilões:     ${allItems.filter(i => i.fonte.includes('Milan')).length} terrenos`);
-  console.log(`  Sato Leilões:      ${allItems.filter(i => i.fonte.includes('Sato')).length} terrenos`);
-  console.log(`  Frazão Leilões:    ${allItems.filter(i => i.fonte.includes('Frazão')).length} terrenos`);
-  console.log(`  Grupo Lance:       ${allItems.filter(i => i.fonte.includes('Grupo')).length} terrenos`);
-  console.log(`  LEJE:              ${allItems.filter(i => i.fonte.includes('LEJE')).length} terrenos`);
-  console.log(`  Leilão Imóvel:     ${allItems.filter(i => i.fonte.includes('Agregado')).length} terrenos`);
-  console.log(`  TOTAL:             ${allItems.length} terrenos`);
+  for (const s of sources) {
+    const count = allItems.filter(i => i.fonte.toLowerCase().includes(s.name.toLowerCase().split(' ')[0])).length;
+    console.log(`  ${s.name.padEnd(28)}: ${count} terrenos`);
+  }
+  console.log(`  ${'─'.repeat(54)}`);
+  console.log(`  TOTAL CONSOLIDADO           : ${allItems.length} terrenos`);
   console.log(`\n💾 Dados salvos em: ${outputPath}`);
-  console.log(`\n✅ Scraping completo!\n`);
+  console.log(`\n✅ Scraping completo com sucesso!\n`);
 }
 
 main().catch(err => {
   console.error(`💥 Erro fatal: ${err.message}`);
   process.exit(1);
 });
+

@@ -52,12 +52,24 @@ function cleanCidade(raw: string): string {
 function mapSource(fonte: string): AuctionSource {
   if (fonte.includes('Zuk')) return 'Portal Zuk';
   if (fonte.includes('Mega')) return 'Mega Leilões';
+  if (fonte.includes('Biasi')) return 'Biasi Leilões';
   if (fonte.includes('Sodré')) return 'Sodré Santoro';
   if (fonte.includes('Milan')) return 'Milan Leilões';
   if (fonte.includes('Freitas')) return 'Freitas Leiloeiro';
+  if (fonte.includes('Sato')) return 'Sato Leilões';
+  if (fonte.includes('Frazão') || fonte.includes('Frazao')) return 'Frazão Leilões';
+  if (fonte.includes('Grupo Lance')) return 'Grupo Lance';
+  if (fonte.includes('LEJE')) return 'LEJE Leilões';
+  if (fonte.includes('Pestana')) return 'Pestana Leilões';
+  if (fonte.includes('Lut')) return 'Lut Leilões';
+  if (fonte.includes('Viva')) return 'Viva Leilões';
+  if (fonte.includes('Lance Judicial')) return 'Lance Judicial';
+  if (fonte.includes('Superbid')) return 'Superbid';
+  if (fonte.includes('Agregado') || fonte.includes('Imóvel') || fonte.includes('Imovel')) return 'Leilão Imóvel';
   if (fonte.includes('Caixa')) return 'Caixa Econômica';
   return 'Portal Zuk';
 }
+
 
 function convertToAuctionLot(raw: RawAnaliseItem): AuctionLot {
   const bairro = cleanBairro(raw.bairro);

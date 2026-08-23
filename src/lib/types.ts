@@ -80,6 +80,16 @@ export type AuctionSource =
   | 'Sodré Santoro'
   | 'Milan Leilões'
   | 'Freitas Leiloeiro'
+  | 'Sato Leilões'
+  | 'Frazão Leilões'
+  | 'Grupo Lance'
+  | 'LEJE Leilões'
+  | 'Pestana Leilões'
+  | 'Lut Leilões'
+  | 'Viva Leilões'
+  | 'Lance Judicial'
+  | 'Superbid'
+  | 'Leilão Imóvel'
   | 'Caixa Econômica';
 
 export interface ScrapingStatus {
