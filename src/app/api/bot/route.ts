@@ -280,9 +280,9 @@ function buildContextPrompt(userMessage: string, contextItems: AnaliseItem[]): s
 
 // --- DeepSeek Provider (API compatível com OpenAI) ---
 async function getDeepSeekResponse(userMessage: string, contextItems: AnaliseItem[]): Promise<string> {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
+  const apiKey = process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_KEY;
   if (!apiKey || apiKey.length < 10) {
-    throw new Error('DEEPSEEK_API_KEY não configurada');
+    throw new Error('Chave do DeepSeek não configurada (DEEPSEEK_API_KEY ou DEEPSEEK_KEY)');
   }
 
   const contextPrompt = buildContextPrompt(userMessage, contextItems);
