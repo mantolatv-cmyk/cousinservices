@@ -5,20 +5,24 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { exec } from 'child_process';
+import { exec, ExecOptions } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
+
 
 const execAsync = promisify(exec);
 
 // Opções robustas para exec — scraping pode gerar muito output e demorar
-const EXEC_OPTIONS = {
+const EXEC_OPTIONS: ExecOptions & { encoding: 'utf-8' } = {
   cwd: path.resolve(process.cwd()),
   maxBuffer: 50 * 1024 * 1024,  // 50MB buffer (scrapers geram muito log)
   timeout: 5 * 60 * 1000,       // 5 minutos por comando
-  env: { ...process.env, NODE_ENV: 'production' },
+  env: process.env,
   shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/bash',
+  encoding: 'utf-8',
 };
+
+
 
 interface PipelineResult {
   success: boolean;
@@ -52,8 +56,10 @@ async function runLocalPipeline(): Promise<PipelineResult> {
     const phase1Duration = Date.now() - phase1Start;
     console.log(`✅ [Update API] Scraping concluído em ${(phase1Duration / 1000).toFixed(1)}s`);
 
-    // Extrair contagem de itens do output
-    const totalMatch = stdout.match(/TOTAL:\s*(\d+)\s*terrenos/);
+    const outStr = String(stdout || '');
+    const errStr = String(stderr || '');
+
+    const totalMatch = outStr.match(/TOTAL:\s*(\d+)\s*terrenos/);
     const totalItems = totalMatch ? totalMatch[1] : '?';
 
     phases.push({
@@ -61,11 +67,10 @@ async function runLocalPipeline(): Promise<PipelineResult> {
       status: 'success',
       durationMs: phase1Duration,
       details: `${totalItems} terrenos coletados de 16 fontes`,
-
     });
 
-    if (stderr && !stderr.includes('Warning')) {
-      console.warn(`⚠️ [Update API] Stderr do scraper: ${stderr.substring(0, 200)}`);
+    if (errStr && !errStr.includes('Warning')) {
+      console.warn(`⚠️ [Update API] Stderr do scraper: ${errStr.substring(0, 200)}`);
     }
   } catch (err) {
     const phase1Duration = Date.now() - phase1Start;
@@ -98,8 +103,10 @@ async function runLocalPipeline(): Promise<PipelineResult> {
     console.log(`✅ [Update API] Análise concluída em ${(phase2Duration / 1000).toFixed(1)}s`);
 
     // Extrair info do output
-    const viableMatch = stdout.match(/(\d+)\s*com ROI/);
+    const analiseOut = String(stdout || '');
+    const viableMatch = analiseOut.match(/(\d+)\s*com ROI/);
     const viableCount = viableMatch ? viableMatch[1] : '?';
+
 
     phases.push({
       name: 'Análise Financeira',
