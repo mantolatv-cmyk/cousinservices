@@ -59,6 +59,7 @@ export default function Home() {
   const [botFilter, setBotFilter] = useState<string | null>(null);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] = useState<{ success: boolean; message: string; phases: Array<{ name: string; status: string; durationMs: number; details?: string }>; totalDurationMs: number } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [priceRange, setPriceRange] = useState<string>('all');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -240,21 +241,23 @@ export default function Home() {
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
+    setRefreshResult(null);
     try {
-      // 1. Trigger the server-side update (scraping + analysis + git push)
       const res = await fetch('/api/update', { method: 'POST' });
       const result = await res.json();
+      setRefreshResult(result);
       
       if (result.success) {
-        // 2. Refresh the UI with the newly generated data
         await fetchLots();
-        alert('🚀 Atualização Completa!\nNovos dados coletados, analisados e sincronizados no GitHub.');
-      } else {
-        alert('⚠️ Houve um problema na atualização:\n' + result.message);
       }
     } catch (err) {
       console.error('Update failed:', err);
-      alert('❌ Erro de conexão ao tentar atualizar os dados.');
+      setRefreshResult({
+        success: false,
+        message: 'Erro de conexão ao tentar atualizar os dados.',
+        phases: [],
+        totalDurationMs: 0,
+      });
     } finally {
       setIsRefreshing(false);
     }
@@ -287,8 +290,8 @@ export default function Home() {
             <span className="status-dot" />
             <span>{lastUpdate ? `Última atualização: ${lastUpdate}` : dataSource}</span>
           </div>
-          <button className="btn btn-primary" onClick={handleRefresh} disabled={isRefreshing}>
-            {isRefreshing ? '⟳ Atualizando…' : '⟳ Atualizar Dados'}
+          <button className="btn btn-primary" onClick={handleRefresh} disabled={isRefreshing} style={isRefreshing ? { animation: 'pulse 1.5s infinite', cursor: 'wait' } : {}}>
+            {isRefreshing ? '⟳ Scraping em andamento…' : '⟳ Atualizar Dados'}
           </button>
           <button className="btn btn-sm" onClick={() => setIsSettingsOpen(true)} title="Configurações AI">
             ⚙️
@@ -298,6 +301,76 @@ export default function Home() {
           </button>
         </div>
       </header>
+
+      {/* === PIPELINE PROGRESS OVERLAY === */}
+      {(isRefreshing || refreshResult) && (
+        <div style={{
+          margin: '0 24px 16px',
+          padding: '20px 24px',
+          background: 'var(--bg-card)',
+          border: `1px solid ${refreshResult?.success === false ? 'rgba(255, 51, 102, 0.3)' : refreshResult?.success ? 'rgba(0, 255, 163, 0.3)' : 'rgba(0, 224, 255, 0.3)'}`,
+          borderRadius: '14px',
+          animation: 'fadeIn 0.3s ease',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {isRefreshing ? (
+                <><span style={{ animation: 'pulse 1.5s infinite' }}>🔄</span> Pipeline de Atualização em Andamento...</>
+              ) : refreshResult?.success ? (
+                <><span>✅</span> Atualização Concluída!</>
+              ) : (
+                <><span>⚠️</span> Atualização com Problemas</>
+              )}
+            </div>
+            {!isRefreshing && (
+              <button onClick={() => setRefreshResult(null)} style={{
+                background: 'none', border: '1px solid var(--border)', borderRadius: '8px',
+                color: 'var(--text-muted)', padding: '4px 12px', fontSize: '12px', cursor: 'pointer',
+              }}>✕ Fechar</button>
+            )}
+          </div>
+
+          {isRefreshing && !refreshResult && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {['🌐 Scraping de 11 leiloeiros...', '💰 Análise financeira pendente', '📤 Sincronização pendente'].map((label, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: i === 0 ? '#00E0FF' : 'var(--text-muted)' }}>
+                  <span style={{ width: '20px', textAlign: 'center' }}>{i === 0 ? <span style={{ animation: 'pulse 1s infinite' }}>⟳</span> : '○'}</span>
+                  <span>{label}</span>
+                </div>
+              ))}
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px', fontStyle: 'italic' }}>
+                ⏱️ O scraping pode levar de 2 a 5 minutos dependendo da velocidade dos sites...
+              </div>
+            </div>
+          )}
+
+          {refreshResult && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {refreshResult.phases.map((phase, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px' }}>
+                  <span style={{ width: '20px', textAlign: 'center' }}>
+                    {phase.status === 'success' ? '✅' : phase.status === 'error' ? '❌' : '⏭️'}
+                  </span>
+                  <span style={{ flex: 1, fontWeight: 600 }}>{phase.name}</span>
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '11px', color: 'var(--text-muted)' }}>
+                    {(phase.durationMs / 1000).toFixed(1)}s
+                  </span>
+                </div>
+              ))}
+              {refreshResult.phases.some(p => p.details) && (
+                <div style={{ marginTop: '8px', padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  {refreshResult.phases.filter(p => p.details).map((p, i) => (
+                    <div key={i}>▸ {p.details}</div>
+                  ))}
+                </div>
+              )}
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', fontFamily: "'JetBrains Mono', monospace" }}>
+                Tempo total: {(refreshResult.totalDurationMs / 1000).toFixed(1)}s
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* === BOT FILTER INDICATOR === */}
       {botFilter && (
