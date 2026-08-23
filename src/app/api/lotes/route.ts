@@ -8,6 +8,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { AuctionLot, AuctionSource, HiddenCosts, InvestmentAnalysis } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+
 interface RawAnaliseItem {
   id: string;
   fonte: string;
@@ -199,5 +203,12 @@ export async function GET(req: NextRequest) {
     source,
     total: filtered.length,
     lots: filtered,
+  }, {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
   });
 }
+

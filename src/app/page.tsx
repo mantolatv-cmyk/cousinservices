@@ -105,12 +105,13 @@ export default function Home() {
   const fetchLots = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/lotes');
+      const res = await fetch(`/api/lotes?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       setAllLots(data.lots || []);
       setDataSource(data.source || 'desconhecido');
       setLastUpdate(data.generatedAt ? new Date(data.generatedAt).toLocaleString('pt-BR') : '');
     } catch {
+
       setDataSource('Erro ao carregar dados');
     } finally {
       setIsLoading(false);
